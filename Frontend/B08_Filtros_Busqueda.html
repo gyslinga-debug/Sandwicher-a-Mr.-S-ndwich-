@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Catálogo con Filtros | Mr. Sandwich</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="index.html" class="brand-icon" style="text-decoration: none; color: inherit;">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Sabor que te acompaña</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" onclick="window.location.href='B10_Carrito_de_Compras.html'">🛒</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Search Bar -->
+    <section style="margin: var(--spacing-xl) 0;">
+      <div style="position: relative;">
+        <input 
+          id="searchInput" 
+          type="text" 
+          placeholder="🔍 Buscar productos..." 
+          style="width: 100%; padding: var(--spacing-md) var(--spacing-lg); padding-right: 100px; border: 2px solid rgba(166, 107, 58, 0.3); border-radius: var(--border-radius); font-size: 1rem; background: white; box-shadow: 0 4px 12px rgba(166, 107, 58, 0.1);">
+        <button 
+          id="clearSearch" 
+          onclick="clearSearch()" 
+          style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: var(--brand-beige); color: var(--brand-brown); border: none; padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--border-radius); font-size: 0.9rem; font-weight: 600; cursor: pointer; display: none;">
+          ✕ Limpiar
+        </button>
+      </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section style="margin-bottom: var(--spacing-xl);">
+      <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-lg); box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1); border: 2px solid rgba(166, 107, 58, 0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+          <h2 style="margin: 0; color: var(--brand-brown-dark); font-size: 1.3rem;">🎛️ Filtros</h2>
+          <button onclick="resetFilters()" style="background: var(--brand-beige); color: var(--brand-brown); border: 2px solid var(--brand-brown); padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--border-radius); font-size: 0.9rem; font-weight: 600; cursor: pointer;">
+            Limpiar todo
+          </button>
+        </div>
+
+        <!-- Category Filter -->
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #5D4037;">Categoría</label>
+          <select id="categoryFilter" onchange="applyFilters()" style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 1rem; background: white; cursor: pointer; appearance: auto; -webkit-appearance: menulist; -moz-appearance: menulist;">
+            <option value="">Todas las categorías</option>
+            <option value="sandwich">🥪 Sandwiches</option>
+            <option value="bebida">🥤 Bebidas</option>
+            <option value="postre">🍰 Postres</option>
+            <option value="acompañamiento">🍟 Acompañamientos</option>
+          </select>
+        </div>
+
+        <!-- Price Range Filter -->
+        <div style="margin-bottom: var(--spacing-lg);">
+          <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Rango de precio</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+            <div>
+              <input 
+                id="minPrice" 
+                type="number" 
+                placeholder="Mínimo" 
+                min="0"
+                onchange="applyFilters()"
+                style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem;">
+            </div>
+            <div>
+              <input 
+                id="maxPrice" 
+                type="number" 
+                placeholder="Máximo" 
+                min="0"
+                onchange="applyFilters()"
+                style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Availability Filter -->
+        <div>
+          <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer; font-weight: 600; color: var(--brand-brown-dark);">
+            <input id="availableOnly" type="checkbox" onchange="applyFilters()" style="width: 20px; height: 20px; cursor: pointer;">
+            <span>Solo mostrar productos disponibles</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Summary -->
+    <section style="margin-bottom: var(--spacing-lg);">
+      <div id="resultsSummary" style="text-align: center; padding: var(--spacing-md); background: var(--brand-beige); border-radius: var(--border-radius); font-weight: 600; color: var(--brand-brown-dark);"></div>
+    </section>
+
+    <!-- Loading State -->
+    <div id="loadingState" style="text-align: center; padding: var(--spacing-2xl);">
+      <div style="font-size: 2rem; margin-bottom: var(--spacing-lg);">⏳</div>
+      <p style="color: rgba(43,43,43,0.7);">Cargando productos...</p>
+    </div>
+
+    <!-- Products Grid -->
+    <section id="productsGrid" class="product-grid" style="display: none;"></section>
+
+    <!-- No Results -->
+    <div id="noResults" style="text-align: center; padding: var(--spacing-2xl); background: white; border-radius: var(--border-radius); box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1); display: none;">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg); opacity: 0.5;">🔍</div>
+      <h3 style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark);">No se encontraron productos</h3>
+      <p style="color: rgba(43,43,43,0.7); margin-bottom: var(--spacing-lg);">
+        Intenta ajustar los filtros o la búsqueda
+      </p>
+      <button onclick="resetFilters()" style="background: var(--brand-brown); color: white; border: none; padding: var(--spacing-md) var(--spacing-xl); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(166, 107, 58, 0.3);">
+        Limpiar filtros
+      </button>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="index.html">
+      <span class="icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="B07_Catalogo.html" class="active">
+      <span class="icon">🥘</span>
+      <span>Catálogo</span>
+    </a>
+    <a href="B10_Carrito_de_Compras.html">
+      <span class="icon">🛒</span>
+      <span>Carrito</span>
+    </a>
+    <a href="B04_Perfil_Usuario.html">
+      <span class="icon">👤</span>
+      <span>Perfil</span>
+    </a>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let allProducts = [];
+    let filteredProducts = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadProducts();
+      
+      // Real-time search
+      document.getElementById('searchInput').addEventListener('input', function(e) {
+        const clearBtn = document.getElementById('clearSearch');
+        clearBtn.style.display = e.target.value ? 'block' : 'none';
+        applyFilters();
+      });
+    });
+
+    async function loadProducts() {
+      const loadingState = document.getElementById('loadingState');
+      const productsGrid = document.getElementById('productsGrid');
+
+      loadingState.style.display = 'block';
+      productsGrid.style.display = 'none';
+
+      try {
+        const data = await window.api.getProducts();
+        allProducts = data || [];
+        applyFilters();
+        loadingState.style.display = 'none';
+      } catch (error) {
+        console.error('Error loading products:', error);
+        loadingState.innerHTML = '<div style="text-align: center; color: #c33;">❌ Error al cargar productos</div>';
+      }
+    }
+
+    function getProductEmoji(productName, category) {
+      const name = productName.toLowerCase();
+      
+      if (name.includes('coca-cola') || name.includes('coca cola')) return '🥤';
+      if (name.includes('sprite')) return '🥤';
+      if (name.includes('pollo') || name.includes('chicken')) return '🍗';
+      if (name.includes('carne') || name.includes('beef')) return '🥩';
+      if (name.includes('jamón') || name.includes('ham')) return '🥓';
+      if (name.includes('veggie') || name.includes('vegano')) return '🥗';
+      if (name.includes('tostado') || name.includes('toast')) return '🍞';
+      if (name.includes('club')) return '🥪';
+      if (name.includes('premium')) return '👑';
+      if (name.includes('doble')) return '🍔';
+      if (name.includes('italiano')) return '🇮🇹';
+      
+      if (category && category.toLowerCase().includes('bebida')) return '🥤';
+      
+      return '🥪';
+    }
+
+    function applyFilters() {
+      const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
+      const category = document.getElementById('categoryFilter').value.toLowerCase();
+      const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+      const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+      const availableOnly = document.getElementById('availableOnly').checked;
+
+      filteredProducts = allProducts.filter(product => {
+        // Search filter
+        const matchesSearch = !searchText || 
+          product.name.toLowerCase().includes(searchText) ||
+          (product.description && product.description.toLowerCase().includes(searchText)) ||
+          (product.category && product.category.toLowerCase().includes(searchText));
+
+        // Category filter
+        const matchesCategory = !category || 
+          (product.category && product.category.toLowerCase().includes(category));
+
+        // Price filter
+        const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
+
+        // Availability filter
+        const matchesAvailability = !availableOnly || product.available !== false;
+
+        return matchesSearch && matchesCategory && matchesPrice && matchesAvailability;
+      });
+
+      displayProducts();
+    }
+
+    function displayProducts() {
+      const productsGrid = document.getElementById('productsGrid');
+      const noResults = document.getElementById('noResults');
+      const resultsSummary = document.getElementById('resultsSummary');
+
+      if (filteredProducts.length === 0) {
+        productsGrid.style.display = 'none';
+        noResults.style.display = 'block';
+        resultsSummary.innerHTML = `<span style="color: #c33;">0 productos encontrados</span> de ${allProducts.length} totales`;
+        return;
+      }
+
+      noResults.style.display = 'none';
+      productsGrid.style.display = 'grid';
+      resultsSummary.innerHTML = `Mostrando <strong>${filteredProducts.length}</strong> de ${allProducts.length} productos`;
+
+      productsGrid.innerHTML = filteredProducts.map(product => {
+        const available = product.available !== false;
+        const emoji = getProductEmoji(product.name, product.category);
+        return `
+          <div class="product-card" style="${!available ? 'opacity: 0.6;' : ''}" onclick="viewProduct('${product._id}')">
+            <div class="product-card-image" style="font-size: 4rem; padding: var(--spacing-xl); text-align: center;">
+              ${emoji}
+            </div>
+            <div class="product-card-body">
+              <div style="background: var(--brand-beige); color: var(--brand-brown); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; margin-bottom: 8px;">
+                ${product.category || 'General'}
+              </div>
+              <h5 class="product-card-name">${product.name}</h5>
+              <p style="color: rgba(43,43,43,0.6); font-size: 0.9rem; margin-bottom: var(--spacing-md); min-height: 40px;">
+                ${product.description || 'Delicioso producto'}
+              </p>
+              <p class="product-card-price">$${product.price?.toLocaleString('es-CL') || '0'}</p>
+              ${!available ? '<p style="color: #dc3545; font-size: 0.85rem; font-weight: 600; margin-top: 8px;">No disponible</p>' : ''}
+              <div class="product-card-actions" onclick="event.stopPropagation()">
+                <button 
+                  class="btn btn-primary" 
+                  onclick="addToCart('${product._id}')"
+                  ${!available ? 'disabled style="background: #999; cursor: not-allowed;"' : ''}
+                  style="width: 100%; padding: 12px; font-size: 1rem;">
+                  ${available ? '🛒 Agregar' : '❌ No disponible'}
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function viewProduct(productId) {
+      window.location.href = `B09_Detalle_Producto.html?id=${productId}`;
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('clearSearch').style.display = 'none';
+      applyFilters();
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('categoryFilter').value = '';
+      document.getElementById('minPrice').value = '';
+      document.getElementById('maxPrice').value = '';
+      document.getElementById('availableOnly').checked = false;
+      document.getElementById('clearSearch').style.display = 'none';
+      applyFilters();
+    }
+
+    function addToCart(productId) {
+      const product = allProducts.find(p => p._id === productId);
+      if (!product) return;
+
+      window.cartModule.addToCart(product);
+      
+      // Visual feedback
+      const button = event.target;
+      const originalText = button.innerHTML;
+      button.innerHTML = '✅ Agregado';
+      button.style.background = 'var(--brand-green)';
+      
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.background = 'var(--brand-brown)';
+      }, 1500);
+    }
+  </script>
+</body>
+</html>

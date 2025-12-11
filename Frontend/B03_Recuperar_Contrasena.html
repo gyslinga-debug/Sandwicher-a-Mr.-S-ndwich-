@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Recuperar Contraseña | Mr. Sandwich</title>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="index.html" class="brand-icon" style="text-decoration: none; color: inherit;">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Sabor que te acompaña</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" onclick="history.back()">←</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Recovery Form -->
+    <section style="margin: var(--spacing-xl) 0; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg); color: var(--brand-brown);">🔑</div>
+      <h1 style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark);">Recuperar contraseña</h1>
+      <p style="font-size: 1rem; margin-bottom: var(--spacing-xl); color: rgba(43,43,43,0.7);">
+        Te enviaremos instrucciones para restablecer tu contraseña
+      </p>
+    </section>
+
+    <!-- Step 1: Request Reset -->
+    <section id="requestSection" style="max-width: 400px; margin: 0 auto var(--spacing-2xl) auto;">
+      <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-xl); box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1); border: 2px solid rgba(166, 107, 58, 0.1);">
+        <form id="requestResetForm">
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Correo electrónico</label>
+            <input id="email" name="email" type="email" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem; transition: border-color 0.3s;" placeholder="correo@ejemplo.com" required>
+          </div>
+
+          <div id="requestMsg" style="margin-bottom: var(--spacing-md);"></div>
+
+          <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+            <button type="submit" style="width: 100%; background: var(--brand-brown); color: white; border: none; padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s; box-shadow: 0 4px 12px rgba(166, 107, 58, 0.3);">
+              Enviar código de recuperación
+            </button>
+            <a href="B01_Inicio_Sesion.html" style="text-align: center; color: var(--brand-brown); text-decoration: none; font-weight: 600;">
+              ← Volver al inicio de sesión
+            </a>
+          </div>
+        </form>
+
+        <div style="margin-top: var(--spacing-lg); padding-top: var(--spacing-lg); border-top: 1px solid #e1e5e9; text-align: center;">
+          <p style="font-size: 0.9rem; color: rgba(43,43,43,0.6); margin: 0;">
+            El código de recuperación expira en 15 minutos
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 2: Reset Password (Hidden initially) -->
+    <section id="resetSection" style="max-width: 400px; margin: 0 auto var(--spacing-2xl) auto; display: none;">
+      <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-xl); box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1); border: 2px solid rgba(166, 107, 58, 0.1);">
+        <div style="text-align: center; margin-bottom: var(--spacing-xl);">
+          <div style="font-size: 2rem; margin-bottom: var(--spacing-sm);">✅</div>
+          <h2 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-sm); font-size: 1.5rem;">Código enviado</h2>
+          <p style="color: rgba(43,43,43,0.7); font-size: 0.9rem;">Revisa tu correo e ingresa el código de 6 dígitos</p>
+        </div>
+
+        <form id="resetPasswordForm">
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Código de verificación</label>
+            <input id="resetCode" name="resetCode" type="text" maxlength="6" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1.5rem; text-align: center; letter-spacing: 0.5rem; font-weight: 600;" placeholder="000000" required>
+          </div>
+
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Nueva contraseña</label>
+            <input id="resetNewPassword" name="newPassword" type="password" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem; transition: border-color 0.3s;" placeholder="Mínimo 6 caracteres" required minlength="6">
+          </div>
+
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Confirmar contraseña</label>
+            <input id="resetConfirmPassword" name="confirmPassword" type="password" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem; transition: border-color 0.3s;" placeholder="Repite tu contraseña" required>
+          </div>
+
+          <div id="resetMsg" style="margin-bottom: var(--spacing-md);"></div>
+
+          <button type="submit" style="width: 100%; background: var(--brand-green); color: white; border: none; padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s; box-shadow: 0 4px 12px rgba(39, 150, 91, 0.3);">
+            Restablecer contraseña
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="index.html">
+      <span class="icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="B07_Catalogo.html">
+      <span class="icon">🥘</span>
+      <span>Catálogo</span>
+    </a>
+    <a href="B10_Carrito_de_Compras.html">
+      <span class="icon">🛒</span>
+      <span>Carrito</span>
+    </a>
+    <a href="B04_Perfil_Usuario.html">
+      <span class="icon">👤</span>
+      <span>Perfil</span>
+    </a>
+  </nav>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let userEmail = '';
+
+    // Step 1: Request reset code
+    document.getElementById('requestResetForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value.trim();
+      const msgEl = document.getElementById('requestMsg');
+      
+      if (!email) {
+        msgEl.innerHTML = '<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc;">Por favor ingresa tu correo electrónico.</div>';
+        return;
+      }
+
+      try {
+        msgEl.innerHTML = '<div style="background: #e3f2fd; color: #1976d2; padding: var(--spacing-md); border-radius: var(--border-radius);">Enviando código...</div>';
+        
+        const response = await fetch('http://localhost:5000/api/auth/request-reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          userEmail = email;
+          msgEl.innerHTML = '<div style="background: #d4edda; color: #155724; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #c3e6cb;">✅ Código enviado a tu correo</div>';
+          
+          setTimeout(() => {
+            document.getElementById('requestSection').style.display = 'none';
+            document.getElementById('resetSection').style.display = 'block';
+          }, 1500);
+        } else {
+          msgEl.innerHTML = `<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc;">${data.message || 'Error al enviar el código'}</div>`;
+        }
+      } catch (error) {
+        msgEl.innerHTML = '<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc;">Error de conexión. Intenta nuevamente.</div>';
+      }
+    });
+
+    // Step 2: Reset password with code
+    document.getElementById('resetPasswordForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const resetCode = document.getElementById('resetCode').value.trim();
+      const newPassword = document.getElementById('resetNewPassword').value;
+      const confirmPassword = document.getElementById('resetConfirmPassword').value;
+      const msgEl = document.getElementById('resetMsg');
+      
+      if (!resetCode || !newPassword || !confirmPassword) {
+        msgEl.innerHTML = '<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc;">Por favor completa todos los campos.</div>';
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        msgEl.innerHTML = '<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc;">Las contraseñas no coinciden.</div>';
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        msgEl.innerHTML = '<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc;">La contraseña debe tener al menos 6 caracteres.</div>';
+        return;
+      }
+
+      try {
+        msgEl.innerHTML = '<div style="background: #e3f2fd; color: #1976d2; padding: var(--spacing-md); border-radius: var(--border-radius);">Restableciendo contraseña...</div>';
+        
+        const response = await fetch('http://localhost:5000/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            email: userEmail,
+            resetCode,
+            newPassword 
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          msgEl.innerHTML = '<div style="background: #d4edda; color: #155724; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #c3e6cb;">✅ Contraseña restablecida exitosamente</div>';
+          
+          setTimeout(() => {
+            window.location.href = 'B01_Inicio_Sesion.html';
+          }, 2000);
+        } else {
+          msgEl.innerHTML = `<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc;">${data.message || 'Código inválido o expirado'}</div>`;
+        }
+      } catch (error) {
+        msgEl.innerHTML = '<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc;">Error de conexión. Intenta nuevamente.</div>';
+      }
+    });
+  </script>
+</body>
+</html>

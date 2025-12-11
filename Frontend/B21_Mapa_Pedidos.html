@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa de Pedidos | Mr. Sandwich 🥪</title>
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    
+    #map {
+      width: 100%;
+      height: 500px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .order-item {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 10px rgba(166, 107, 58, 0.1);
+      border: 2px solid rgba(166, 107, 58, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .order-item:hover {
+      border-color: #A66B3A;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(166, 107, 58, 0.2);
+    }
+
+    .order-item.selected {
+      border-color: #A66B3A;
+      background: #F5EFE7;
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .order-number {
+      font-weight: 700;
+      color: #2B2B2B;
+      font-size: 1.1rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: white;
+    }
+
+    .status-preparing { background: #9c27b0; }
+    .status-in_transit { background: #ff9800; }
+    .status-delivered { background: #4caf50; }
+
+    .order-address {
+      color: rgba(43, 43, 43, 0.7);
+      font-size: 0.95rem;
+      margin-bottom: 5px;
+    }
+
+    .order-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: rgba(43, 43, 43, 0.6);
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+    }
+
+    .filter-tab {
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: 2px solid #A66B3A;
+      background: white;
+      color: #A66B3A;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+
+    .filter-tab.active {
+      background: #A66B3A;
+      color: white;
+    }
+
+    .legend {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(166, 107, 58, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+    }
+
+    .legend-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+    }
+
+    @media (min-width: 768px) {
+      .map-container {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 20px;
+        align-items: start;
+      }
+
+      #map {
+        height: 600px;
+        position: sticky;
+        top: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header style="background: #A66B3A; color: white; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <a href="B19_Ordenes_Despacho.html" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: white; text-decoration: none; font-size: 1.5rem;">←</a>
+    <div style="font-size: 2rem; margin-bottom: 4px;">🗺️</div>
+    <h1 style="font-size: 1.5rem; font-weight: 800; margin: 0;">Mapa de Pedidos</h1>
+  </header>
+
+  <!-- Main Content -->
+  <main style="padding: 20px; max-width: 1400px; margin: 0 auto;">
+    
+    <!-- Not Admin State -->
+    <div id="notAdmin" style="display: none; text-align: center; padding: 40px;">
+      <div style="font-size: 4rem; margin-bottom: 15px;">🔒</div>
+      <h2 style="color: #2B2B2B; margin-bottom: 15px;">Acceso Restringido</h2>
+      <p style="color: rgba(43,43,43,0.7); margin-bottom: 20px;">Solo los administradores pueden ver el mapa de pedidos</p>
+      <button onclick="window.location.href='index.html'" class="btn btn-primary">
+        Volver al Inicio
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" style="text-align: center; padding: 40px;">
+      <div style="font-size: 3rem; margin-bottom: 15px;">⏳</div>
+      <p style="color: rgba(43,43,43,0.7);">Cargando mapa...</p>
+    </div>
+
+    <!-- Map Content -->
+    <div id="mapContent" style="display: none;">
+      
+      <!-- Filters -->
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="filterOrders('all')">
+          Todos
+        </button>
+        <button class="filter-tab" onclick="filterOrders('preparing')">
+          🍳 Preparando
+        </button>
+        <button class="filter-tab" onclick="filterOrders('in_transit')">
+          🚚 En Camino
+        </button>
+        <button class="filter-tab" onclick="filterOrders('delivered')">
+          ✅ Entregados
+        </button>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <div style="font-weight: 700; color: #2B2B2B; margin-bottom: 10px;">Leyenda</div>
+        <div class="legend-item">
+          <div class="legend-icon" style="background: #9c27b0;"></div>
+          <span>Preparando</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-icon" style="background: #ff9800;"></div>
+          <span>En Camino</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-icon" style="background: #4caf50;"></div>
+          <span>Entregado</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-icon" style="background: #A66B3A;"></div>
+          <span>Tienda (Mr. Sandwich)</span>
+        </div>
+      </div>
+
+      <!-- Map and Orders Grid -->
+      <div class="map-container">
+        <!-- Map -->
+        <div>
+          <div id="map"></div>
+        </div>
+
+        <!-- Orders List -->
+        <div>
+          <h3 style="color: #2B2B2B; margin-bottom: 15px; font-size: 1.2rem;">
+            Pedidos Activos (<span id="orderCount">0</span>)
+          </h3>
+          
+          <div id="emptyOrders" style="display: none; text-align: center; padding: 40px;">
+            <div style="font-size: 3rem; margin-bottom: 15px;">📦</div>
+            <p style="color: rgba(43,43,43,0.7);">No hay pedidos activos</p>
+          </div>
+
+          <div id="ordersList"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    let map;
+    let markers = {};
+    let allOrders = [];
+    let currentFilter = 'all';
+    let storeMarker;
+
+    const STORE_LOCATION = [-33.4489, -70.6693];
+
+    function geocodeAddress(address) {
+      const baseLat = -33.4489;
+      const baseLng = -70.6693;
+      const randomLat = baseLat + (Math.random() - 0.5) * 0.1;
+      const randomLng = baseLng + (Math.random() - 0.5) * 0.1;
+      return [randomLat, randomLng];
+    }
+
+    function getMarkerColor(status) {
+      const colors = {
+        'preparing': '#9c27b0',
+        'in_transit': '#ff9800',
+        'delivered': '#4caf50'
+      };
+      return colors[status] || '#666';
+    }
+
+    function createCustomIcon(color) {
+      return L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="
+          background-color: ${color};
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          border: 3px solid white;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        "></div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      });
+    }
+
+    function initMap() {
+      map = L.map('map').setView(STORE_LOCATION, 13);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+      }).addTo(map);
+
+      const storeIcon = L.divIcon({
+        className: 'store-marker',
+        html: `<div style="
+          background-color: #A66B3A;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 4px solid white;
+          box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+        ">🥪</div>`,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+      });
+
+      storeMarker = L.marker(STORE_LOCATION, { icon: storeIcon })
+        .addTo(map)
+        .bindPopup('<strong>🥪 Mr. Sandwich</strong><br>Tienda Principal');
+    }
+
+    async function loadOrders() {
+      try {
+        const userStr = localStorage.getItem('user');
+        if (!userStr) {
+          window.location.href = 'B01_Inicio_Sesion.html';
+          return;
+        }
+
+        const user = JSON.parse(userStr);
+        
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = 'B01_Inicio_Sesion.html';
+          return;
+        }
+
+        if (!user.isAdmin && user.role !== 'admin') {
+          document.getElementById('loadingState').style.display = 'none';
+          document.getElementById('notAdmin').style.display = 'block';
+          return;
+        }
+
+        const response = await fetch('http://localhost:5000/api/admin/orders', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) throw new Error('Error al cargar pedidos');
+
+        const orders = await response.json();
+        
+        allOrders = orders.filter(order => 
+          ['preparing', 'in_transit', 'delivered'].includes(order.status)
+        );
+
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('mapContent').style.display = 'block';
+
+        initMap();
+        displayOrders();
+
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('loadingState').innerHTML = `
+          <div style="font-size: 3rem; margin-bottom: 15px;">❌</div>
+          <p style="color: #dc3545;">Error al cargar pedidos</p>
+          <button onclick="location.reload()" class="btn btn-primary">Reintentar</button>
+        `;
+      }
+    }
+
+    function displayOrders() {
+      const filteredOrders = currentFilter === 'all' 
+        ? allOrders 
+        : allOrders.filter(order => order.status === currentFilter);
+
+      Object.values(markers).forEach(marker => map.removeLayer(marker));
+      markers = {};
+
+      document.getElementById('orderCount').textContent = filteredOrders.length;
+
+      if (filteredOrders.length === 0) {
+        document.getElementById('emptyOrders').style.display = 'block';
+        document.getElementById('ordersList').innerHTML = '';
+        return;
+      }
+
+      document.getElementById('emptyOrders').style.display = 'none';
+
+      const ordersHTML = filteredOrders.map(order => {
+        const statusText = {
+          'preparing': 'Preparando',
+          'in_transit': 'En Camino',
+          'delivered': 'Entregado'
+        }[order.status];
+
+        const address = formatAddress(order.deliveryAddress);
+
+        return `
+          <div class="order-item" onclick="selectOrder('${order._id}')" id="order-${order._id}">
+            <div class="order-header">
+              <span class="order-number">#${order._id.slice(-6).toUpperCase()}</span>
+              <span class="status-badge status-${order.status}">${statusText}</span>
+            </div>
+            <div class="order-address">📍 ${address}</div>
+            <div class="order-info">
+              <span>${order.items.length} producto(s)</span>
+              <span>$${order.total.toLocaleString('es-CL')}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('ordersList').innerHTML = ordersHTML;
+
+      filteredOrders.forEach(order => {
+        const coords = geocodeAddress(formatAddress(order.deliveryAddress));
+        const color = getMarkerColor(order.status);
+        const icon = createCustomIcon(color);
+
+        const marker = L.marker(coords, { icon })
+          .addTo(map)
+          .bindPopup(`
+            <strong>#${order._id.slice(-6).toUpperCase()}</strong><br>
+            ${formatAddress(order.deliveryAddress)}<br>
+            <span style="color: ${color}; font-weight: 600;">${
+              { 'preparing': 'Preparando', 'in_transit': 'En Camino', 'delivered': 'Entregado' }[order.status]
+            }</span>
+          `);
+
+        markers[order._id] = marker;
+        marker.on('click', () => selectOrder(order._id));
+      });
+
+      if (filteredOrders.length > 0) {
+        const group = L.featureGroup([storeMarker, ...Object.values(markers)]);
+        map.fitBounds(group.getBounds().pad(0.1));
+      }
+    }
+
+    function selectOrder(orderId) {
+      document.querySelectorAll('.order-item').forEach(el => el.classList.remove('selected'));
+      
+      const orderEl = document.getElementById(`order-${orderId}`);
+      if (orderEl) {
+        orderEl.classList.add('selected');
+        orderEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      if (markers[orderId]) {
+        markers[orderId].openPopup();
+        map.setView(markers[orderId].getLatLng(), 15);
+      }
+    }
+
+    function filterOrders(filter) {
+      currentFilter = filter;
+      
+      document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
+
+      displayOrders();
+    }
+
+    function formatAddress(addr) {
+      if (!addr) return 'Sin dirección';
+      return `${addr.street} ${addr.number}, ${addr.commune}`;
+    }
+
+    loadOrders();
+  </script>
+</body>
+</html>

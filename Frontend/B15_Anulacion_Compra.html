@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Anular Pedido | Mr. Sandwich 🥪</title>
+  <link rel="stylesheet" href="css/mobile.css">
+  <style>
+    .order-card {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+      box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1);
+      border: 2px solid rgba(166, 107, 58, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .order-card:hover {
+      border-color: var(--brand-brown);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(166, 107, 58, 0.2);
+    }
+
+    .order-card.selected {
+      border-color: var(--brand-brown);
+      background: var(--brand-beige);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: white;
+    }
+
+    .status-pending { background: #ff9800; }
+    .status-confirmed { background: #2196f3; }
+    .status-preparing { background: #9c27b0; }
+
+    .cancellable-only {
+      color: rgba(43, 43, 43, 0.6);
+      font-size: 0.9rem;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .cancel-reason {
+      width: 100%;
+      padding: var(--spacing-md);
+      border: 2px solid var(--brand-brown);
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      margin-bottom: var(--spacing-lg);
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: var(--spacing-xl);
+      border-radius: var(--border-radius);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .modal-icon {
+      font-size: 4rem;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-lg);
+    }
+
+    .btn-group button {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header style="background: var(--brand-brown); color: white; padding: var(--spacing-lg); text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <a href="B06_Historial_Pedidos.html" style="position: absolute; left: var(--spacing-md); top: 50%; transform: translateY(-50%); color: white; text-decoration: none; font-size: 1.5rem;">←</a>
+    <img src="assets/images/logo.png" alt="Mr. Sandwich" style="width: 60px; height: 60px; margin: 0 auto 4px; display: block; object-fit: contain;">
+    <h1 style="font-size: 1.5rem; font-weight: 800; margin: 0;">Anular Pedido</h1>
+  </header>
+
+  <!-- Main Content -->
+  <main style="padding: var(--spacing-lg); max-width: 800px; margin: 0 auto;">
+    
+    <!-- Not Logged In State -->
+    <div id="notLoggedIn" style="display: none; text-align: center; padding: var(--spacing-xl);">
+      <div style="font-size: 4rem; margin-bottom: var(--spacing-md);">🔒</div>
+      <h2 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-md);">Acceso Restringido</h2>
+      <p style="color: rgba(43,43,43,0.7); margin-bottom: var(--spacing-lg);">Debes iniciar sesión para anular pedidos</p>
+      <button onclick="window.location.href='B01_Inicio_Sesion.html'" class="btn btn-primary">
+        Iniciar Sesión
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" style="text-align: center; padding: var(--spacing-xl);">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-md);">⏳</div>
+      <p style="color: rgba(43,43,43,0.7);">Cargando pedidos...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" style="display: none; text-align: center; padding: var(--spacing-xl);">
+      <div style="font-size: 4rem; margin-bottom: var(--spacing-md);">📦</div>
+      <h2 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-md);">No hay pedidos para anular</h2>
+      <p style="color: rgba(43,43,43,0.7); margin-bottom: var(--spacing-lg);">Solo puedes anular pedidos en estado pendiente, confirmado o preparando</p>
+      <button onclick="window.location.href='B06_Historial_Pedidos.html'" class="btn btn-primary">
+        Ver Historial
+      </button>
+    </div>
+
+    <!-- Orders Section -->
+    <div id="ordersSection" style="display: none;">
+      <p class="cancellable-only">
+        ℹ️ Solo puedes anular pedidos en estado: Pendiente, Confirmado o Preparando
+      </p>
+
+      <div id="ordersList"></div>
+
+      <!-- Cancel Form -->
+      <div id="cancelForm" style="display: none; background: white; border-radius: var(--border-radius); padding: var(--spacing-lg); box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1);">
+        <h3 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-md); font-size: 1.2rem;">Motivo de anulación</h3>
+        
+        <textarea id="cancelReason" class="cancel-reason" placeholder="Describe el motivo de la anulación (opcional)"></textarea>
+
+        <div style="background: var(--brand-beige); border-left: 4px solid var(--brand-brown); padding: var(--spacing-md); margin-bottom: var(--spacing-lg); border-radius: 4px;">
+          <strong style="color: var(--brand-brown-dark);">⚠️ Advertencia:</strong>
+          <p style="margin: var(--spacing-sm) 0 0 0; color: rgba(43,43,43,0.8); font-size: 0.95rem;">
+            Esta acción no se puede deshacer. El pedido será marcado como cancelado de forma permanente.
+          </p>
+        </div>
+
+        <div class="btn-group">
+          <button onclick="cancelCancellation()" class="btn btn-secondary">
+            Volver
+          </button>
+          <button onclick="confirmCancellation()" class="btn btn-primary">
+            Confirmar Anulación
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Success Modal -->
+  <div id="successModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-icon">✅</div>
+      <h2 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-md);">Pedido Anulado</h2>
+      <p style="color: rgba(43,43,43,0.7); margin-bottom: var(--spacing-lg);">
+        El pedido ha sido cancelado exitosamente
+      </p>
+      <button onclick="window.location.href='B06_Historial_Pedidos.html'" class="btn btn-primary" style="width: 100%;">
+        Volver al Historial
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Modal -->
+  <div id="errorModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-icon">❌</div>
+      <h2 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-md);">Error</h2>
+      <p id="errorMessage" style="color: rgba(43,43,43,0.7); margin-bottom: var(--spacing-lg);">
+        No se pudo anular el pedido
+      </p>
+      <button onclick="closeErrorModal()" class="btn btn-secondary" style="width: 100%;">
+        Cerrar
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let cancellableOrders = [];
+    let selectedOrderId = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+    });
+
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      const notLoggedIn = document.getElementById('notLoggedIn');
+      const loadingState = document.getElementById('loadingState');
+
+      if (!token) {
+        loadingState.style.display = 'none';
+        notLoggedIn.style.display = 'block';
+        return;
+      }
+
+      loadCancellableOrders();
+    }
+
+    async function loadCancellableOrders() {
+      const token = localStorage.getItem('token');
+      const loadingState = document.getElementById('loadingState');
+      const emptyState = document.getElementById('emptyState');
+      const ordersSection = document.getElementById('ordersSection');
+
+      try {
+        const response = await fetch('http://localhost:5000/api/orders/my', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al cargar pedidos');
+        }
+
+        const data = await response.json();
+        const allOrders = Array.isArray(data) ? data : (data.orders || []);
+        
+        // Filter only cancellable orders (pending, confirmed, preparing)
+        cancellableOrders = allOrders.filter(order => 
+          ['pending', 'confirmed', 'preparing'].includes(order.status)
+        );
+        
+        loadingState.style.display = 'none';
+        
+        if (cancellableOrders.length === 0) {
+          emptyState.style.display = 'block';
+        } else {
+          ordersSection.style.display = 'block';
+          displayOrders();
+          
+          // Auto-select order from URL parameter
+          const urlParams = new URLSearchParams(window.location.search);
+          const orderIdParam = urlParams.get('orderId');
+          if (orderIdParam) {
+            const orderExists = cancellableOrders.find(o => o._id === orderIdParam);
+            if (orderExists) {
+              selectOrder(orderIdParam);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading orders:', error);
+        loadingState.style.display = 'none';
+        emptyState.style.display = 'block';
+      }
+    }
+
+    function displayOrders() {
+      const ordersList = document.getElementById('ordersList');
+      
+      ordersList.innerHTML = cancellableOrders.map(order => {
+        const date = new Date(order.createdAt).toLocaleDateString('es-CL', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        const statusLabels = {
+          pending: 'Pendiente',
+          confirmed: 'Confirmado',
+          preparing: 'Preparando'
+        };
+
+        const statusLabel = statusLabels[order.status] || order.status;
+
+        return `
+          <div class="order-card" onclick="selectOrder('${order._id}')" id="order-${order._id}">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--spacing-md);">
+              <div>
+                <div style="font-weight: 700; color: var(--brand-brown-dark); margin-bottom: 4px; font-size: 1.1rem;">
+                  Pedido #${order._id.slice(-6).toUpperCase()}
+                </div>
+                <div style="color: rgba(43,43,43,0.7); font-size: 0.9rem;">${date}</div>
+              </div>
+              <span class="status-badge status-${order.status}">
+                ${statusLabel}
+              </span>
+            </div>
+
+            <div style="margin-bottom: var(--spacing-sm);">
+              ${order.items.map(item => `
+                <div style="display: flex; justify-content: space-between; padding: var(--spacing-xs) 0;">
+                  <span style="color: rgba(43,43,43,0.8);">${item.product?.name || 'Producto'} × ${item.quantity}</span>
+                  <span style="font-weight: 600; color: var(--brand-brown);">$${(item.price * item.quantity).toLocaleString('es-CL')}</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <div style="display: flex; justify-content: space-between; padding-top: var(--spacing-sm); border-top: 2px solid var(--brand-beige); margin-top: var(--spacing-sm);">
+              <span style="font-weight: 700; color: var(--brand-brown-dark);">Total</span>
+              <span style="font-weight: 800; color: var(--brand-brown); font-size: 1.2rem;">
+                $${(order.total || order.totalAmount || 0).toLocaleString('es-CL')}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectOrder(orderId) {
+      // Remove previous selection
+      document.querySelectorAll('.order-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+
+      // Select new order
+      const selectedCard = document.getElementById(`order-${orderId}`);
+      selectedCard.classList.add('selected');
+      selectedOrderId = orderId;
+
+      // Show cancel form
+      document.getElementById('cancelForm').style.display = 'block';
+      document.getElementById('cancelReason').value = '';
+      
+      // Scroll to form
+      document.getElementById('cancelForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function cancelCancellation() {
+      selectedOrderId = null;
+      document.getElementById('cancelForm').style.display = 'none';
+      document.querySelectorAll('.order-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+    }
+
+    async function confirmCancellation() {
+      if (!selectedOrderId) {
+        showError('No se ha seleccionado ningún pedido');
+        return;
+      }
+
+      const token = localStorage.getItem('token');
+      const reason = document.getElementById('cancelReason').value.trim();
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/orders/${selectedOrderId}/cancel`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ reason })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Error al anular el pedido');
+        }
+
+        // Show success modal
+        document.getElementById('successModal').classList.add('active');
+      } catch (error) {
+        console.error('Error cancelling order:', error);
+        showError(error.message);
+      }
+    }
+
+    function showError(message) {
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorModal').classList.add('active');
+    }
+
+    function closeErrorModal() {
+      document.getElementById('errorModal').classList.remove('active');
+    }
+
+    // Close modals on backdrop click
+    document.getElementById('successModal').addEventListener('click', (e) => {
+      if (e.target.id === 'successModal') {
+        window.location.href = 'B06_Historial_Pedidos.html';
+      }
+    });
+
+    document.getElementById('errorModal').addEventListener('click', (e) => {
+      if (e.target.id === 'errorModal') {
+        closeErrorModal();
+      }
+    });
+  </script>
+</body>
+</html>

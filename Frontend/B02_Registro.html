@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Registro | Mr. Sandwich</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/mobile.css">
+  <style>
+    /* Animaciones para registro */
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      50% { transform: translateY(-20px) translateX(10px); }
+    }
+    
+    .card {
+      animation: scaleIn 0.5s ease-out;
+    }
+    
+    .btn {
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+      pointer-events: none;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn * {
+      position: relative;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(166, 107, 58, 0.3);
+    }
+    
+    .form-control {
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(166, 107, 58, 0.2);
+    }
+    
+    /* Fondo animado */
+    body::before {
+      content: '';
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(166,107,58,0.1) 0%, transparent 70%);
+      top: -200px;
+      left: -200px;
+      animation: float 8s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    body::after {
+      content: '';
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(39,150,91,0.08) 0%, transparent 70%);
+      bottom: -150px;
+      right: -150px;
+      animation: float 10s ease-in-out infinite reverse;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .container {
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="index.html" class="brand-icon" style="text-decoration: none; color: inherit;">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Sabor que te acompaña</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" onclick="history.back()">←</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Registration Form -->
+    <section style="margin: var(--spacing-xl) 0; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg); color: var(--brand-brown);">📝</div>
+      <h1 style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark);">Crear cuenta</h1>
+      <p style="font-size: 1rem; margin-bottom: var(--spacing-xl); color: rgba(43,43,43,0.7);">
+        Únete a nuestra comunidad de amantes de los sándwiches
+      </p>
+    </section>
+
+    <section style="max-width: 400px; margin: 0 auto var(--spacing-2xl) auto;">
+      <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-xl); box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1); border: 2px solid rgba(166, 107, 58, 0.1);">
+        <form id="registerForm">
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Nombre completo</label>
+            <input id="name" name="name" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem; transition: border-color 0.3s;" placeholder="Nombre y apellido" required>
+          </div>
+
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Correo electrónico</label>
+            <input id="email" name="email" type="email" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem; transition: border-color 0.3s;" placeholder="correo@ejemplo.com" required>
+          </div>
+
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Dirección</label>
+            <input id="address" name="address" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem; transition: border-color 0.3s;" placeholder="Calle, número, comuna">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+            <div>
+              <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Contraseña</label>
+              <input id="password" name="password" type="password" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem; transition: border-color 0.3s;" placeholder="Mínimo 6 caracteres" required>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Confirmar</label>
+              <input id="confirmPassword" type="password" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem; transition: border-color 0.3s;" placeholder="Repetir contraseña" required>
+            </div>
+          </div>
+
+          <p style="font-size: 0.9rem; color: rgba(43,43,43,0.6); margin-bottom: var(--spacing-lg); text-align: center;">
+            Se enviará un enlace de verificación al correo
+          </p>
+
+          <div id="msg" style="margin-bottom: var(--spacing-lg);"></div>
+
+          <button id="submitBtn" style="width: 100%; background: var(--brand-brown); color: white; border: none; padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s; box-shadow: 0 4px 12px rgba(166, 107, 58, 0.3);" type="submit">
+            Crear cuenta
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: var(--spacing-lg); padding-top: var(--spacing-lg); border-top: 1px solid #e1e5e9;">
+          <p style="margin: 0; color: rgba(43,43,43,0.7);">
+            ¿Ya tienes cuenta?
+            <a href="B01_Inicio_Sesion.html" style="color: var(--brand-brown); text-decoration: none; font-weight: 600;">Inicia sesión</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="index.html">
+      <span class="icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="B07_Catalogo.html">
+      <span class="icon">🥘</span>
+      <span>Catálogo</span>
+    </a>
+    <a href="B10_Carrito_de_Compras.html">
+      <span class="icon">🛒</span>
+      <span>Carrito</span>
+    </a>
+    <a href="B04_Perfil_Usuario.html">
+      <span class="icon">👤</span>
+      <span>Perfil</span>
+    </a>
+  </nav>
+<script>
+// Ocultar formulario si ya está loggeado (antes de mostrar el formulario)
+if (localStorage.getItem('token')) {
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('main').innerHTML = '<div style="text-align:center;padding:3rem"><h2>Ya has iniciado sesión</h2><a href="B04_Perfil_Usuario.html" style="color:var(--brand-brown);font-weight:600">Ir a mi perfil</a></div>';
+  });
+} else {
+  document.getElementById('registerForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const msgEl = document.getElementById('msg');
+  msgEl.innerHTML = '';
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const confirm = document.getElementById('confirmPassword').value;
+  const address = document.getElementById('address').value.trim();
+
+  if (!name || !email || !password) {
+    msgEl.innerHTML = '<div class="alert alert-warning">Completa los campos requeridos.</div>';
+    return;
+  }
+  if (password !== confirm) {
+    msgEl.innerHTML = '<div class="alert alert-danger">Las contraseñas no coinciden.</div>';
+    return;
+  }
+  if (password.length < 6) {
+    msgEl.innerHTML = '<div class="alert alert-warning">La contraseña debe tener al menos 6 caracteres.</div>';
+    return;
+  }
+
+  const payload = { name, email, password, phone: '', address };
+  try {
+    const res = await fetch('http://localhost:5000/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (res.ok) {
+      msgEl.innerHTML = '<div class="alert alert-success">Registro exitoso. Redirigiendo...</div>';
+      // Optionally save token
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
+      setTimeout(()=> location.href = 'index.html', 1200);
+    } else if (data.errors) {
+      msgEl.innerHTML = '<div class="alert alert-danger">' + data.errors.map(e=>e.msg).join('<br>') + '</div>';
+    } else if (data.message) {
+      msgEl.innerHTML = '<div class="alert alert-danger">' + data.message + '</div>';
+    } else if (data.error) {
+      msgEl.innerHTML = '<div class="alert alert-danger">' + data.error + '</div>';
+    } else {
+      msgEl.innerHTML = '<div class="alert alert-danger">Error desconocido.</div>';
+    }
+  } catch (err) {
+    console.error('Register error:', err);
+    msgEl.innerHTML = '<div class="alert alert-danger">No se pudo conectar al servidor.</div>';
+    console.error(err);
+  }
+});
+}
+</script>
+<script src="js/animations.js"></script>
+</body>
+</html>

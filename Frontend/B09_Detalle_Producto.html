@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Detalle de Producto | Mr. Sandwich</title>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="B07_Catalogo.html" class="brand-icon" style="text-decoration: none; color: inherit;">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Detalle del Producto</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" onclick="history.back()">←</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Loading State -->
+    <div id="loadingState" class="spinner-container">
+      <div class="spinner"></div>
+      <p>Cargando producto...</p>
+    </div>
+
+    <!-- Product Detail -->
+    <div id="productDetail" style="display: none;">
+      <!-- Product Image -->
+      <section style="margin: var(--spacing-xl) 0; text-align: center;">
+        <div id="productIcon" style="font-size: 8rem; margin-bottom: var(--spacing-lg); filter: drop-shadow(0 4px 8px rgba(166, 107, 58, 0.3));">🥪</div>
+      </section>
+
+      <!-- Product Info Card -->
+      <div class="card">
+        <div class="card-body">
+          <div style="text-align: center; margin-bottom: var(--spacing-lg);">
+            <div id="productCategory" style="display: inline-block; background: var(--brand-beige); color: var(--brand-brown); padding: var(--spacing-xs) var(--spacing-md); border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: var(--spacing-md);">Sandwich</div>
+            <h1 id="productName" style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark); font-size: 2rem;">Nombre del Producto</h1>
+            <p id="productDescription" style="color: rgba(43,43,43,0.7); font-size: 1rem; line-height: 1.6; margin-bottom: var(--spacing-lg);">Descripción del producto</p>
+            <div id="productPrice" style="font-size: 2.5rem; font-weight: 800; color: var(--brand-brown); margin-bottom: var(--spacing-md);">$0</div>
+            <div id="availabilityBadge"></div>
+          </div>
+
+          <!-- Quantity Selector -->
+          <div style="display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); margin-bottom: var(--spacing-xl);">
+            <label style="font-weight: 600; color: var(--brand-brown-dark);">Cantidad:</label>
+            <div class="quantity-selector">
+              <button onclick="decrementQuantity()">−</button>
+              <input id="quantity" type="number" value="1" min="1" readonly>
+              <button onclick="incrementQuantity()">+</button>
+            </div>
+          </div>
+
+          <!-- Add to Cart Button -->
+          <button id="addToCartBtn" class="btn btn-primary" style="width: 100%; padding: 18px; font-size: 1.1rem; margin-bottom: var(--spacing-md);">
+            🛒 Agregar al carrito
+          </button>
+
+          <!-- Back to Catalog -->
+          <button onclick="history.back()" class="btn btn-secondary" style="width: 100%; padding: 18px; font-size: 1.1rem;">
+            ← Volver al catálogo
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="empty-state" style="display: none;">
+      <div class="empty-state-icon">❌</div>
+      <h3 class="empty-state-title">Producto no encontrado</h3>
+      <p class="empty-state-message">No pudimos cargar la información del producto</p>
+      <button onclick="history.back()" class="btn btn-primary">Volver al catálogo</button>
+    </div>
+  </main>
+
+  <!-- Success Modal -->
+  <div class="modal-overlay" id="successModal" style="display:none;">
+    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: var(--border-radius); padding: var(--spacing-xl); max-width: 300px; text-align: center; z-index: 300; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+      <div style="font-size: 4rem; margin-bottom: var(--spacing-md);">✅</div>
+      <h2 style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark);">¡Producto agregado!</h2>
+      <p style="margin-bottom: var(--spacing-lg); color: rgba(43,43,43,0.7);">El producto se agregó a tu carrito</p>
+      <button class="btn btn-primary btn-block" onclick="goToCart()">Ver carrito</button>
+      <button class="btn btn-secondary btn-block" onclick="closeSuccessModal()">Seguir comprando</button>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let currentProduct = null;
+
+    // Get product ID from URL
+    function getProductIdFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    // Load product details
+    async function loadProductDetail() {
+      const productId = getProductIdFromURL();
+      
+      if (!productId) {
+        showError();
+        return;
+      }
+
+      const loadingState = document.getElementById('loadingState');
+      const productDetail = document.getElementById('productDetail');
+      const errorState = document.getElementById('errorState');
+
+      loadingState.style.display = 'flex';
+      productDetail.style.display = 'none';
+      errorState.style.display = 'none';
+
+      try {
+        const product = await window.api.getProductById(productId);
+        
+        if (!product) {
+          showError();
+          return;
+        }
+
+        currentProduct = product;
+        displayProduct(product);
+
+        loadingState.style.display = 'none';
+        productDetail.style.display = 'block';
+      } catch (error) {
+        console.error('Error loading product:', error);
+        showError();
+      }
+    }
+
+    function displayProduct(product) {
+      // Emoji based on category or name
+      const emoji = getProductEmoji(product.name, product.category);
+      document.getElementById('productIcon').textContent = emoji;
+      
+      document.getElementById('productName').textContent = product.name;
+      document.getElementById('productDescription').textContent = product.description || 'Delicioso producto preparado con ingredientes frescos y de calidad.';
+      document.getElementById('productPrice').textContent = `$${product.price?.toLocaleString('es-CL') || '0'}`;
+      document.getElementById('productCategory').textContent = product.category || 'General';
+
+      const available = product.available !== false;
+      const availabilityBadge = document.getElementById('availabilityBadge');
+      const addBtn = document.getElementById('addToCartBtn');
+
+      if (available) {
+        availabilityBadge.innerHTML = '<span style="color: var(--brand-green); font-weight: 600;">✓ Disponible</span>';
+        addBtn.disabled = false;
+        addBtn.onclick = addToCart;
+      } else {
+        availabilityBadge.innerHTML = '<span style="color: #dc3545; font-weight: 600;">✗ No disponible</span>';
+        addBtn.disabled = true;
+        addBtn.textContent = '❌ No disponible';
+        addBtn.style.background = '#999';
+        addBtn.style.cursor = 'not-allowed';
+      }
+    }
+
+    function getProductEmoji(productName, category) {
+      const name = productName.toLowerCase();
+      
+      if (name.includes('coca-cola') || name.includes('coca cola')) return '🥤';
+      if (name.includes('sprite')) return '🥤';
+      if (name.includes('pollo') || name.includes('chicken')) return '🍗';
+      if (name.includes('carne') || name.includes('beef')) return '🥩';
+      if (name.includes('jamón') || name.includes('ham')) return '🥓';
+      if (name.includes('veggie') || name.includes('vegano')) return '🥗';
+      if (name.includes('tostado') || name.includes('toast')) return '🍞';
+      if (name.includes('club')) return '🥪';
+      if (name.includes('premium')) return '👑';
+      if (name.includes('doble')) return '🍔';
+      if (name.includes('italiano')) return '🇮🇹';
+      
+      if (category && category.toLowerCase().includes('bebida')) return '🥤';
+      
+      return '🥪';
+    }
+
+    function showError() {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('productDetail').style.display = 'none';
+      document.getElementById('errorState').style.display = 'flex';
+    }
+
+    function incrementQuantity() {
+      const input = document.getElementById('quantity');
+      input.value = parseInt(input.value) + 1;
+    }
+
+    function decrementQuantity() {
+      const input = document.getElementById('quantity');
+      if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+      }
+    }
+
+    function addToCart() {
+      if (!currentProduct) return;
+
+      const quantity = parseInt(document.getElementById('quantity').value);
+      
+      for (let i = 0; i < quantity; i++) {
+        window.cartModule.addToCart(currentProduct);
+      }
+
+      showSuccessModal();
+    }
+
+    function showSuccessModal() {
+      document.getElementById('successModal').style.display = 'block';
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('successModal').style.display = 'none';
+    }
+
+    function goToCart() {
+      window.location.href = 'B10_Carrito_de_Compras.html';
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', loadProductDetail);
+  </script>
+</body>
+</html>

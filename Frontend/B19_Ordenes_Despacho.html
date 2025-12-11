@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Órdenes de Despacho | Mr. Sandwich</title>
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="index.html" class="brand-icon" title="Ir al inicio">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Órdenes de Despacho</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" onclick="window.history.back()">←</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section style="margin: var(--spacing-xl) 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg); flex-wrap: wrap; gap: var(--spacing-md);">
+        <h2 style="color: var(--brand-brown-dark); margin: 0;">🚚 Órdenes de Despacho</h2>
+        <a href="B21_Mapa_Pedidos.html" style="background: var(--brand-brown); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; min-height: 48px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
+          🗺️ Ver Mapa
+        </a>
+      </div>
+      
+      <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-lg); box-shadow: var(--box-shadow);">
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--brand-beige);">
+                <th style="padding: var(--spacing-md); text-align: left; color: var(--brand-brown-dark);">Pedido</th>
+                <th style="padding: var(--spacing-md); text-align: left; color: var(--brand-brown-dark);">Cliente</th>
+                <th style="padding: var(--spacing-md); text-align: left; color: var(--brand-brown-dark);">Estado</th>
+                <th style="padding: var(--spacing-md); text-align: left; color: var(--brand-brown-dark);">Dirección</th>
+                <th style="padding: var(--spacing-md); text-align: left; color: var(--brand-brown-dark);">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="dispatchOrders">
+              <tr>
+                <td colspan="5" style="padding: var(--spacing-xl); text-align: center;">
+                  <div class="spinner"></div>
+                  <p>Cargando órdenes...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="index.html">
+      <span class="icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="B16_Dashboard.html">
+      <span class="icon">📊</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="B17_Graficos_Ventas.html">
+      <span class="icon">📈</span>
+      <span>Gráficos</span>
+    </a>
+    <a href="B19_Ordenes_Despacho.html" class="active">
+      <span class="icon">🚚</span>
+      <span>Despacho</span>
+    </a>
+  </nav>
+
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

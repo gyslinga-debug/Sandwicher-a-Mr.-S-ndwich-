@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Direcciones | Mr. Sandwich</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="index.html" class="brand-icon" style="text-decoration: none; color: inherit;">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Sabor que te acompaña</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" onclick="window.history.back()">←</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Page Header -->
+    <section style="margin: var(--spacing-xl) 0; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg); color: var(--brand-brown);">📍</div>
+      <h1 style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark);">Mis Direcciones</h1>
+      <p style="font-size: 1rem; margin-bottom: var(--spacing-xl); color: rgba(43,43,43,0.7);">
+        Gestiona tus direcciones de entrega
+      </p>
+    </section>
+
+    <!-- Loading State -->
+    <div id="loadingState" style="text-align: center; padding: var(--spacing-2xl); display: none;">
+      <div style="font-size: 2rem; margin-bottom: var(--spacing-lg);">⏳</div>
+      <p style="color: rgba(43,43,43,0.7);">Cargando direcciones...</p>
+    </div>
+
+    <!-- Add Address Button -->
+    <section id="addressSection" style="max-width: 600px; margin: 0 auto var(--spacing-2xl) auto; display: none;">
+      <button onclick="openAddressModal()" style="width: 100%; background: var(--brand-brown); color: white; border: none; padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; margin-bottom: var(--spacing-xl); box-shadow: 0 4px 12px rgba(166, 107, 58, 0.3); transition: transform 0.2s;">
+        ➕ Agregar nueva dirección
+      </button>
+
+      <!-- Addresses List -->
+      <div id="addressesList"></div>
+
+      <!-- Empty State -->
+      <div id="emptyState" style="text-align: center; padding: var(--spacing-2xl); background: white; border-radius: var(--border-radius); box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1); display: none;">
+        <div style="font-size: 3rem; margin-bottom: var(--spacing-lg); opacity: 0.5;">📭</div>
+        <h3 style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark);">No tienes direcciones</h3>
+        <p style="color: rgba(43,43,43,0.7); margin-bottom: var(--spacing-lg);">
+          Agrega tu primera dirección de entrega
+        </p>
+      </div>
+    </section>
+
+    <!-- Not Logged In State -->
+    <section id="notLoggedIn" style="text-align: center; padding: var(--spacing-2xl); display: none;">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg);">🔒</div>
+      <h2 style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark);">Acceso requerido</h2>
+      <p style="margin-bottom: var(--spacing-xl); color: rgba(43,43,43,0.7);">
+        Debes iniciar sesión para gestionar tus direcciones
+      </p>
+      <a href="B01_Inicio_Sesion.html" style="background: var(--brand-brown); color: white; padding: var(--spacing-md) var(--spacing-xl); border-radius: var(--border-radius); text-decoration: none; font-weight: 600; display: inline-block; box-shadow: 0 4px 12px rgba(166, 107, 58, 0.3);">
+        Iniciar sesión
+      </a>
+    </section>
+  </main>
+
+  <!-- Address Modal -->
+  <div id="addressModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center; padding: var(--spacing-lg);">
+    <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-xl); max-width: 500px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto;">
+      <h2 id="modalTitle" style="margin-bottom: var(--spacing-lg); color: var(--brand-brown-dark); text-align: center;">Agregar Dirección</h2>
+      
+      <form id="addressForm">
+        <input type="hidden" id="addressIndex" value="">
+
+        <div style="margin-bottom: var(--spacing-lg);">
+          <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Etiqueta</label>
+          <input id="addressLabel" type="text" placeholder="Casa, Trabajo, etc." style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem;">
+          <small style="color: rgba(43,43,43,0.6); font-size: 0.9rem;">Opcional</small>
+        </div>
+
+        <div style="margin-bottom: var(--spacing-lg);">
+          <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Calle *</label>
+          <input id="street" type="text" placeholder="Av. Principal" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem;" required>
+        </div>
+
+        <div style="margin-bottom: var(--spacing-lg);">
+          <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Número *</label>
+          <input id="number" type="text" placeholder="123" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem;" required>
+        </div>
+
+        <div style="margin-bottom: var(--spacing-lg);">
+          <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Comuna *</label>
+          <input id="city" type="text" placeholder="Santiago" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem;" required>
+        </div>
+
+        <div id="addressMsg" style="margin-bottom: var(--spacing-lg);"></div>
+
+        <div style="display: flex; gap: var(--spacing-md);">
+          <button type="button" onclick="closeAddressModal()" style="flex: 1; background: #e1e5e9; color: #2b2b2b; border: none; padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer;">
+            Cancelar
+          </button>
+          <button type="submit" style="flex: 1; background: var(--brand-brown); color: white; border: none; padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(166, 107, 58, 0.3);">
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="index.html">
+      <span class="icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="B07_Catalogo.html">
+      <span class="icon">🥘</span>
+      <span>Catálogo</span>
+    </a>
+    <a href="B10_Carrito_de_Compras.html">
+      <span class="icon">🛒</span>
+      <span>Carrito</span>
+    </a>
+    <a href="B04_Perfil_Usuario.html" class="active">
+      <span class="icon">👤</span>
+      <span>Perfil</span>
+    </a>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let currentUser = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadAddresses();
+    });
+
+    async function loadAddresses() {
+      const loadingState = document.getElementById('loadingState');
+      const addressSection = document.getElementById('addressSection');
+      const notLoggedIn = document.getElementById('notLoggedIn');
+
+      loadingState.style.display = 'block';
+      addressSection.style.display = 'none';
+      notLoggedIn.style.display = 'none';
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        loadingState.style.display = 'none';
+        notLoggedIn.style.display = 'block';
+        return;
+      }
+
+      try {
+        const data = await window.api.getProfile();
+        currentUser = data.user;
+        displayAddresses(currentUser.addresses || []);
+        loadingState.style.display = 'none';
+        addressSection.style.display = 'block';
+      } catch (error) {
+        console.error('Error loading addresses:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        loadingState.style.display = 'none';
+        notLoggedIn.style.display = 'block';
+      }
+    }
+
+    function displayAddresses(addresses) {
+      const addressesList = document.getElementById('addressesList');
+      const emptyState = document.getElementById('emptyState');
+
+      if (!addresses || addresses.length === 0) {
+        addressesList.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      addressesList.innerHTML = addresses.map((addr, index) => `
+        <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md); box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1); border: 2px solid rgba(166, 107, 58, 0.1);">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--spacing-md);">
+            <div style="flex: 1;">
+              ${addr.label ? `<div style="font-weight: 700; color: var(--brand-brown); margin-bottom: var(--spacing-xs); font-size: 1.1rem;">🏠 ${addr.label}</div>` : ''}
+              <div style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-xs);">
+                <strong>${addr.street} ${addr.number}</strong>
+              </div>
+              <div style="color: rgba(43,43,43,0.7); font-size: 0.95rem;">
+                ${addr.city}
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid #e1e5e9;">
+            <button onclick="editAddress(${index})" style="flex: 1; background: var(--brand-beige); color: var(--brand-brown-dark); border: 2px solid var(--brand-brown); padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--border-radius); font-size: 0.9rem; font-weight: 600; cursor: pointer;">
+              ✏️ Editar
+            </button>
+            <button onclick="deleteAddress(${index})" style="flex: 1; background: var(--brand-red); color: white; border: none; padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--border-radius); font-size: 0.9rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);">
+              🗑️ Eliminar
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openAddressModal(index = null) {
+      const modal = document.getElementById('addressModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const form = document.getElementById('addressForm');
+      const addressMsg = document.getElementById('addressMsg');
+
+      form.reset();
+      addressMsg.innerHTML = '';
+      
+      if (index !== null) {
+        modalTitle.textContent = 'Editar Dirección';
+        const addr = currentUser.addresses[index];
+        document.getElementById('addressIndex').value = index;
+        document.getElementById('addressLabel').value = addr.label || '';
+        document.getElementById('street').value = addr.street || '';
+        document.getElementById('number').value = addr.number || '';
+        document.getElementById('city').value = addr.city || '';
+      } else {
+        modalTitle.textContent = 'Agregar Dirección';
+        document.getElementById('addressIndex').value = '';
+      }
+
+      modal.style.display = 'flex';
+    }
+
+    function closeAddressModal() {
+      document.getElementById('addressModal').style.display = 'none';
+    }
+
+    function editAddress(index) {
+      openAddressModal(index);
+    }
+
+    async function deleteAddress(index) {
+      if (!confirm('¿Estás seguro de eliminar esta dirección?')) {
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const addresses = [...currentUser.addresses];
+        addresses.splice(index, 1);
+
+        const response = await fetch('http://localhost:5000/api/users/profile', {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ addresses })
+        });
+
+        if (response.ok) {
+          currentUser.addresses = addresses;
+          localStorage.setItem('user', JSON.stringify(currentUser));
+          displayAddresses(addresses);
+        } else {
+          const data = await response.json();
+          alert(data.message || 'Error al eliminar dirección');
+        }
+      } catch (error) {
+        console.error('Error deleting address:', error);
+        alert('Error de conexión. Inténtalo de nuevo.');
+      }
+    }
+
+    document.getElementById('addressForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const addressMsg = document.getElementById('addressMsg');
+      addressMsg.innerHTML = '';
+
+      const label = document.getElementById('addressLabel').value.trim();
+      const street = document.getElementById('street').value.trim();
+      const number = document.getElementById('number').value.trim();
+      const city = document.getElementById('city').value.trim();
+      const index = document.getElementById('addressIndex').value;
+
+      if (!street || !number || !city) {
+        addressMsg.innerHTML = '<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc; font-size: 0.9rem;">Todos los campos marcados con * son obligatorios</div>';
+        return;
+      }
+
+      const newAddress = { street, number, city };
+      if (label) newAddress.label = label;
+
+      try {
+        const token = localStorage.getItem('token');
+        let addresses = [...(currentUser.addresses || [])];
+
+        if (index !== '') {
+          // Edit existing
+          addresses[parseInt(index)] = newAddress;
+        } else {
+          // Add new
+          addresses.push(newAddress);
+        }
+
+        const response = await fetch('http://localhost:5000/api/users/profile', {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ addresses })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          currentUser.addresses = addresses;
+          localStorage.setItem('user', JSON.stringify(currentUser));
+          displayAddresses(addresses);
+          closeAddressModal();
+        } else {
+          addressMsg.innerHTML = `<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc; font-size: 0.9rem;">${data.message || 'Error al guardar dirección'}</div>`;
+        }
+      } catch (error) {
+        console.error('Error saving address:', error);
+        addressMsg.innerHTML = '<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc; font-size: 0.9rem;">Error de conexión. Inténtalo de nuevo.</div>';
+      }
+    });
+
+    // Cerrar modal al hacer clic fuera
+    document.getElementById('addressModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeAddressModal();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Carrito | Mr. Sandwich</title>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <div class="brand-icon">🛒</div>
+        <div class="brand-text">
+          <h1>Tu Carrito</h1>
+          <p>Revisa tu pedido</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Empty Cart State -->
+    <div id="emptyCartState" class="empty-state">
+      <div class="empty-state-icon">🛒</div>
+      <h2 class="empty-state-title">Carrito vacío</h2>
+      <p class="empty-state-message">No has agregado productos aún. ¡Vuelve al catálogo y selecciona tus favoritos!</p>
+      <a href="B07_Catalogo.html" class="btn btn-primary">
+        🥪 Ver catálogo
+      </a>
+    </div>
+
+    <!-- Cart Content -->
+    <div id="cartContent" style="display: none;">
+      <!-- Cart Items -->
+      <div class="card">
+        <div class="card-header">Productos en tu carrito</div>
+        <div class="card-body" id="cartItemsList">
+          <!-- Items will be injected here -->
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="card">
+        <div class="card-header">Resumen del pedido</div>
+        <div class="card-body">
+          <div class="price-summary">
+            <div class="price-row">
+              <span>Subtotal:</span>
+              <span id="subtotalPrice">$0</span>
+            </div>
+            <div class="price-row">
+              <span>Descuento:</span>
+              <span id="discountPrice">$0</span>
+            </div>
+            <div class="price-row">
+              <span>Envío:</span>
+              <span id="shippingPrice">$2.990</span>
+            </div>
+            <div class="price-row total">
+              <span>Total a pagar:</span>
+              <span id="totalPrice">$0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coupon Code -->
+      <div class="card">
+        <label for="couponCode">Código de descuento (opcional)</label>
+        <div class="form-group inline">
+          <input type="text" id="couponCode" placeholder="Ingresa tu código">
+          <button class="btn btn-secondary btn-sm">Aplicar</button>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div style="margin-bottom: var(--spacing-lg); display: flex; gap: var(--spacing-md);">
+        <a href="B07_Catalogo.html" class="btn btn-secondary btn-block">
+          ← Seguir comprando
+        </a>
+        <button class="btn btn-primary btn-block" onclick="goToCheckout()">
+          Proceder al Pago →
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="index.html">
+      <span class="icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="B07_Catalogo.html">
+      <span class="icon">🥘</span>
+      <span>Catálogo</span>
+    </a>
+    <a href="B10_Carrito_de_Compras.html" class="active">
+      <span class="icon">🛒</span>
+      <span>Carrito</span>
+    </a>
+    <a href="B04_Perfil_Usuario.html">
+      <span class="icon">👤</span>
+      <span>Perfil</span>
+    </a>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    function init() {
+      renderCart();
+    }
+
+    function renderCart() {
+      if (!window.cart || window.cart.items.length === 0) {
+        document.getElementById('emptyCartState').style.display = 'flex';
+        document.getElementById('cartContent').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('emptyCartState').style.display = 'none';
+      document.getElementById('cartContent').style.display = 'block';
+
+      const itemsList = document.getElementById('cartItemsList');
+      const items = window.cart.items;
+
+      itemsList.innerHTML = items.map(item => `
+        <div class="list-item">
+          <div class="list-item-image">${item.image || '🥪'}</div>
+          <div class="list-item-content">
+            <div class="list-item-name">${item.name}</div>
+            <div class="list-item-description">
+              $${item.price.toLocaleString('es-CL')} × ${item.quantity}
+            </div>
+            <div class="list-item-price">
+              $${(item.price * item.quantity).toLocaleString('es-CL')}
+            </div>
+          </div>
+          <div class="list-item-actions">
+            <button onclick="removeItem(${item.id})" class="btn-sm" title="Eliminar">
+              🗑️
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const subtotal = window.cart.getTotal();
+      const shipping = 2990;
+      const discount = 0;
+      const total = subtotal + shipping - discount;
+
+      document.getElementById('subtotalPrice').textContent = `$${subtotal.toLocaleString('es-CL')}`;
+      document.getElementById('shippingPrice').textContent = `$${shipping.toLocaleString('es-CL')}`;
+      document.getElementById('discountPrice').textContent = `$${discount.toLocaleString('es-CL')}`;
+      document.getElementById('totalPrice').textContent = `$${total.toLocaleString('es-CL')}`;
+    }
+
+    function removeItem(productId) {
+      if (window.cart) {
+        window.cart.removeItem(productId);
+        renderCart();
+      }
+    }
+
+    function goToCheckout() {
+      window.location.href = 'B11_Checkout.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

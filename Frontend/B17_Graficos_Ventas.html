@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Gráficos de Ventas | Mr. Sandwich</title>
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="index.html" class="brand-icon" title="Ir al inicio">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Gráficos de Ventas</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" onclick="window.history.back()">←</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section style="margin: var(--spacing-xl) 0;">
+      <h2 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-lg);">📈 Gráficos de Ventas</h2>
+      
+      <!-- Ventas por día -->
+      <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-lg); box-shadow: var(--box-shadow); margin-bottom: 60px;">
+        <h3 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-md); font-size: 1.2rem;">Ventas por día</h3>
+        <div style="position: relative; height: 360px; margin-bottom: var(--spacing-lg);">
+          <canvas id="salesChart"></canvas>
+        </div>
+      </div>
+      
+      <!-- Ventas por producto -->
+      <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-lg); box-shadow: var(--box-shadow); margin-bottom: var(--spacing-2xl);">
+        <h3 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-md); font-size: 1.2rem;">Ventas por producto</h3>
+        <div style="position: relative; height: 640px; margin-bottom: var(--spacing-lg);">
+          <canvas id="productsChart"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="index.html">
+      <span class="icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="B16_Dashboard.html">
+      <span class="icon">📊</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="B17_Graficos_Ventas.html" class="active">
+      <span class="icon">📈</span>
+      <span>Gráficos</span>
+    </a>
+    <a href="B19_Ordenes_Despacho.html">
+      <span class="icon">🚚</span>
+      <span>Despacho</span>
+    </a>
+  </nav>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

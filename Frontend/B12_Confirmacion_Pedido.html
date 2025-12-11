@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confirmación de Pedido | Mr. Sándwich</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .receipt-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    .receipt-header {
+      background: linear-gradient(135deg, #A66B3A 0%, #8B5A2B 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 10px 10px 0 0;
+      text-align: center;
+    }
+    .success-icon {
+      font-size: 4rem;
+      color: #28a745;
+      margin-bottom: 1rem;
+    }
+    .receipt-body {
+      padding: 2rem;
+    }
+    .receipt-divider {
+      border-top: 2px dashed #dee2e6;
+      margin: 1.5rem 0;
+    }
+    .order-info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+    }
+    .total-row {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #A66B3A;
+      border-top: 2px solid #A66B3A;
+      margin-top: 1rem;
+      padding-top: 1rem;
+    }
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .item-row:last-child {
+      border-bottom: none;
+    }
+    .print-btn {
+      background: #A66B3A;
+      border: none;
+      color: white;
+    }
+    .print-btn:hover {
+      background: #8B5A2B;
+      color: white;
+    }
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      .receipt-container {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-secondary no-print">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <i class="fas fa-bread-slice me-2"></i>
+      Mr. Sandwich
+    </a>
+  </div>
+</nav>
+
+<main class="container my-4">
+  <!-- Spinner de carga -->
+  <div id="loadingSpinner" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-3 text-muted">Cargando información del pedido...</p>
+  </div>
+
+  <!-- Recibo -->
+  <div id="orderConfirmation" style="display: none;"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // Cargar y renderizar pedido directamente desde la URL
+  document.addEventListener('DOMContentLoaded', async function() {
+    const orderConfirmation = document.getElementById('orderConfirmation');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    
+    // Obtener el ID del pedido desde la URL (puede ser 'order' o 'id')
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('order') || urlParams.get('id');
+    
+    if (!orderId) {
+      loadingSpinner.innerHTML = `
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          No se especificó un ID de pedido. 
+          <a href="B07_Catalogo.html" class="alert-link">Volver al catálogo</a>
+        </div>
+      `;
+      return;
+    }
+    
+    try {
+      // Cargar el pedido desde la API
+      const response = await api.getOrder(orderId);
+      const order = response?.data || response;
+      
+      if (!order) {
+        throw new Error('No se recibió información del pedido');
+      }
+      
+      // Ocultar spinner y mostrar contenido
+      loadingSpinner.style.display = 'none';
+      orderConfirmation.style.display = 'block';
+      
+      // Renderizar el recibo mejorado
+      renderEnhancedReceipt(order);
+      
+    } catch (error) {
+      console.error('Error al cargar el pedido:', error);
+      loadingSpinner.innerHTML = `
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          Error al cargar el pedido: ${error.message}
+          <br><a href="B06_Historial_Pedidos.html" class="alert-link">Ver historial de pedidos</a>
+        </div>
+      `;
+    }
+  });
+
+  function renderEnhancedReceipt(order) {
+    const container = document.getElementById('orderConfirmation');
+    
+    container.innerHTML = `
+      <div class="receipt-container">
+        <!-- Header -->
+        <div class="receipt-header">
+          <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h2 class="mb-0">¡Pedido Confirmado!</h2>
+          <p class="mb-0 mt-2">Gracias por tu compra</p>
+        </div>
+
+        <!-- Body -->
+        <div class="receipt-body">
+          <!-- Información del pedido -->
+          <div class="text-center mb-4">
+            <h3 class="text-muted mb-2">RECIBO DE COMPRA</h3>
+            <h4 class="mb-0">Mr. Sandwich</h4>
+            <p class="text-muted small mb-0">Av. Principal 123, Santiago</p>
+            <p class="text-muted small">Tel: +56 9 1234 5678</p>
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <!-- Detalles del pedido -->
+          <div class="order-info-row">
+            <span class="text-muted">Número de Pedido:</span>
+            <strong>#${order.orderNumber || order._id}</strong>
+          </div>
+          <div class="order-info-row">
+            <span class="text-muted">Fecha:</span>
+            <span>${new Date(order.createdAt).toLocaleString('es-CL')}</span>
+          </div>
+          <div class="order-info-row">
+            <span class="text-muted">Estado:</span>
+            <span class="badge bg-success">Confirmado</span>
+          </div>
+          <div class="order-info-row">
+            <span class="text-muted">Método de Pago:</span>
+            <span>${getPaymentMethodText(order.paymentMethod)}</span>
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <!-- Productos -->
+          <h5 class="mb-3">Productos</h5>
+          ${(order.items || []).map(item => `
+            <div class="item-row">
+              <div>
+                <div class="fw-bold">${item.name || 'Producto'}</div>
+                <small class="text-muted">${item.quantity} x ${formatCurrency(item.price)}</small>
+              </div>
+              <div class="fw-bold">${formatCurrency(item.price * item.quantity)}</div>
+            </div>
+          `).join('')}
+
+          <div class="receipt-divider"></div>
+
+          <!-- Totales -->
+          <div class="order-info-row">
+            <span>Subtotal:</span>
+            <span>${formatCurrency(order.subtotal || 0)}</span>
+          </div>
+          <div class="order-info-row">
+            <span>Costo de Envío:</span>
+            <span>${formatCurrency(order.deliveryFee || 0)}</span>
+          </div>
+          ${order.discount > 0 ? `
+          <div class="order-info-row" style="color: #28a745;">
+            <span>Descuento (${order.discountCode || 'DESCUENTO'}):</span>
+            <span>-${formatCurrency(order.discount)}</span>
+          </div>
+          ` : ''}
+          <div class="order-info-row total-row">
+            <span>TOTAL:</span>
+            <span>${formatCurrency(order.total || 0)}</span>
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <!-- Dirección de entrega -->
+          <h5 class="mb-3">Dirección de Entrega</h5>
+          <p class="text-muted mb-0">${formatAddress(order.deliveryAddress)}</p>
+          ${order.deliveryAddress?.instructions ? `
+            <p class="text-muted small mb-0 mt-2">
+              <i class="fas fa-info-circle me-1"></i>
+              ${order.deliveryAddress.instructions}
+            </p>
+          ` : ''}
+
+          <!-- Botones de acción -->
+          <div class="d-grid gap-2 mt-4 no-print">
+            <button class="btn btn-lg print-btn" onclick="window.print()">
+              <i class="fas fa-print me-2"></i>
+              Imprimir Recibo
+            </button>
+            <a href="B14_Boleta_Digital.html?id=${order._id}" class="btn btn-outline-primary btn-lg">
+              <i class="fas fa-file-invoice me-2"></i>
+              Ver Boleta Digital
+            </a>
+            <a href="B06_Historial_Pedidos.html" class="btn btn-outline-secondary">
+              <i class="fas fa-history me-2"></i>
+              Ver Historial de Pedidos
+            </a>
+            <a href="B07_Catalogo.html" class="btn btn-outline-success">
+              <i class="fas fa-shopping-cart me-2"></i>
+              Seguir Comprando
+            </a>
+          </div>
+
+          <!-- Información adicional -->
+          <div class="alert alert-info mt-4 no-print">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Tiempo estimado de entrega:</strong> 45-60 minutos
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function formatCurrency(amount) {
+    return new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP',
+      minimumFractionDigits: 0
+    }).format(amount);
+  }
+
+  function formatAddress(address) {
+    if (!address) return 'No especificada';
+    if (typeof address === 'string') return address;
+    
+    const parts = [];
+    if (address.street) parts.push(address.street);
+    if (address.number) parts.push(`#${address.number}`);
+    if (address.commune) parts.push(address.commune);
+    if (address.city) parts.push(address.city);
+    
+    return parts.length > 0 ? parts.join(', ') : 'No especificada';
+  }
+
+  function getPaymentMethodText(method) {
+    const methods = {
+      'cash': 'Efectivo',
+      'card': 'Tarjeta',
+      'transfer': 'Transferencia'
+    };
+    return methods[method] || method;
+  }
+</script>
+</body>
+</html>

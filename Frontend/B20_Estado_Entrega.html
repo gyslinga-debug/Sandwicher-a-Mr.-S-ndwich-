@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Estado de Entrega | Mr. Sandwich</title>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="index.html" class="brand-icon" title="Ir al inicio">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Estado de Entrega</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" onclick="window.history.back()">←</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Loading State -->
+    <div id="loadingSpinner" class="spinner-container">
+      <div class="spinner"></div>
+      <p>Cargando estado del pedido...</p>
+    </div>
+
+    <!-- Order Status Content -->
+    <div id="orderStatus" style="display: none; margin: var(--spacing-xl) 0;">
+      <!-- El contenido se cargará dinámicamente desde orders.js -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" style="display: none; text-align: center; margin: var(--spacing-2xl) 0;">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg);">📦</div>
+      <h3 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-md);">No se encontró el pedido</h3>
+      <p style="color: rgba(43,43,43,0.7); margin-bottom: var(--spacing-lg);">
+        No pudimos encontrar información sobre este pedido.
+      </p>
+      <a href="B06_Historial_Pedidos.html" class="btn btn-primary">Ver mis pedidos</a>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="index.html">
+      <span class="icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="B07_Catalogo.html">
+      <span class="icon">🥘</span>
+      <span>Catálogo</span>
+    </a>
+    <a href="B10_Carrito_de_Compras.html">
+      <span class="icon">🛒</span>
+      <span>Carrito</span>
+    </a>
+    <a href="B04_Perfil_Usuario.html">
+      <span class="icon">👤</span>
+      <span>Perfil</span>
+    </a>
+  </nav>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/orders.js"></script>
+  <script>
+    // Cargar estado del pedido desde la URL
+    document.addEventListener('DOMContentLoaded', async function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderId = urlParams.get('orderId') || urlParams.get('id');
+      
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      const orderStatus = document.getElementById('orderStatus');
+      const emptyState = document.getElementById('emptyState');
+      
+      console.log('B20 - Order ID:', orderId);
+      
+      if (!orderId) {
+        loadingSpinner.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+      
+      try {
+        const response = await api.getOrder(orderId);
+        const order = response?.data || response;
+        
+        if (!order) {
+          throw new Error('Pedido no encontrado');
+        }
+        
+        // Ocultar loading y mostrar contenido
+        loadingSpinner.style.display = 'none';
+        orderStatus.style.display = 'block';
+        
+        // Renderizar estado del pedido
+        renderOrderStatus(order);
+        
+      } catch (error) {
+        console.error('Error al cargar el pedido:', error);
+        loadingSpinner.style.display = 'none';
+        emptyState.style.display = 'block';
+      }
+    });
+    
+    function renderOrderStatus(order) {
+      const container = document.getElementById('orderStatus');
+      
+      const statusMap = {
+        'pending': { label: 'Pendiente', progress: 20, icon: '⏳' },
+        'confirmed': { label: 'Confirmado', progress: 40, icon: '✅' },
+        'preparing': { label: 'Preparando', progress: 60, icon: '👨‍🍳' },
+        'ready': { label: 'Listo', progress: 80, icon: '📦' },
+        'delivered': { label: 'Entregado', progress: 100, icon: '🎉' },
+        'cancelled': { label: 'Cancelado', progress: 0, icon: '❌' }
+      };
+      
+      const currentStatus = statusMap[order.status] || statusMap['pending'];
+      
+      container.innerHTML = `
+        <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-xl); box-shadow: var(--box-shadow);">
+          <div style="text-align: center; margin-bottom: var(--spacing-xl);">
+            <div style="font-size: 4rem; margin-bottom: var(--spacing-md);">${currentStatus.icon}</div>
+            <h2 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-sm);">Pedido ${order.orderNumber || order._id}</h2>
+            <p style="font-size: 1.2rem; color: var(--color-success); font-weight: 600;">${currentStatus.label}</p>
+          </div>
+          
+          <!-- Progress Bar -->
+          <div style="background: var(--brand-beige); border-radius: 10px; height: 12px; margin-bottom: var(--spacing-xl); overflow: hidden;">
+            <div style="background: var(--brand-brown); height: 100%; width: ${currentStatus.progress}%; transition: width 0.5s;"></div>
+          </div>
+          
+          <!-- Status Steps -->
+          <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-xl); font-size: 0.85rem;">
+            <div style="text-align: center; opacity: ${order.status === 'pending' || order.status === 'confirmed' || order.status === 'preparing' || order.status === 'ready' || order.status === 'delivered' ? '1' : '0.3'};">
+              <div style="font-size: 1.5rem;">✅</div>
+              <div>Confirmado</div>
+            </div>
+            <div style="text-align: center; opacity: ${order.status === 'preparing' || order.status === 'ready' || order.status === 'delivered' ? '1' : '0.3'};">
+              <div style="font-size: 1.5rem;">👨‍🍳</div>
+              <div>Preparando</div>
+            </div>
+            <div style="text-align: center; opacity: ${order.status === 'ready' || order.status === 'delivered' ? '1' : '0.3'};">
+              <div style="font-size: 1.5rem;">📦</div>
+              <div>Listo</div>
+            </div>
+            <div style="text-align: center; opacity: ${order.status === 'delivered' ? '1' : '0.3'};">
+              <div style="font-size: 1.5rem;">🎉</div>
+              <div>Entregado</div>
+            </div>
+          </div>
+          
+          <!-- Order Details -->
+          <div style="border-top: 2px solid var(--brand-beige); padding-top: var(--spacing-lg);">
+            <h3 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-md); font-size: 1.1rem;">Detalles del Pedido</h3>
+            <p style="margin-bottom: var(--spacing-sm);"><strong>Fecha:</strong> ${new Date(order.createdAt).toLocaleString('es-CL')}</p>
+            
+            <!-- Price Breakdown -->
+            <div style="background: var(--brand-beige); border-radius: var(--border-radius); padding: var(--spacing-md); margin: var(--spacing-md) 0;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-xs);">
+                <span>Subtotal:</span>
+                <span style="font-weight: 600;">$${(order.subtotal || 0).toLocaleString('es-CL')}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-xs);">
+                <span>Envío:</span>
+                <span style="font-weight: 600;">$${(order.deliveryFee || 0).toLocaleString('es-CL')}</span>
+              </div>
+              ${order.discount > 0 ? `
+                <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-xs); color: var(--color-success);">
+                  <span>Descuento (${order.discountCode || 'DESCUENTO'}):</span>
+                  <span style="font-weight: 600;">-$${order.discount.toLocaleString('es-CL')}</span>
+                </div>
+              ` : ''}
+              <div style="display: flex; justify-content: space-between; padding-top: var(--spacing-sm); border-top: 2px solid rgba(166, 107, 58, 0.3); font-size: 1.1rem; font-weight: 700; color: var(--brand-brown-dark);">
+                <span>TOTAL:</span>
+                <span>$${order.total.toLocaleString('es-CL')}</span>
+              </div>
+            </div>
+            
+            <p style="margin-bottom: var(--spacing-sm);"><strong>Método de pago:</strong> ${order.paymentMethod === 'cash' ? 'Efectivo' : order.paymentMethod === 'card' ? 'Tarjeta' : 'Transferencia'}</p>
+          </div>
+          
+          <!-- Actions -->
+          <div style="margin-top: var(--spacing-xl); display: flex; gap: var(--spacing-sm);">
+            <a href="B12_Confirmacion_Pedido.html?order=${order._id}" class="btn btn-primary" style="flex: 1;">Ver Recibo</a>
+            <a href="B06_Historial_Pedidos.html" class="btn btn-secondary" style="flex: 1;">Mis Pedidos</a>
+          </div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

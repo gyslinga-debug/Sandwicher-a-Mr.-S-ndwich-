@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Checkout | Mr. Sandwich</title>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <div class="brand-icon">💳</div>
+        <div class="brand-text">
+          <h1>Confirmar Pedido</h1>
+          <p>Paso final</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Progress Bar -->
+    <div style="margin: var(--spacing-lg) 0; display: flex; gap: var(--spacing-sm);">
+      <div style="flex: 1; height: 4px; background: var(--color-success); border-radius: 2px;"></div>
+      <div style="flex: 1; height: 4px; background: var(--color-success); border-radius: 2px;"></div>
+      <div style="flex: 1; height: 4px; background: var(--color-primary); border-radius: 2px;"></div>
+    </div>
+
+    <!-- Cart Summary -->
+    <div class="card">
+      <div class="card-header">Tu orden</div>
+      <div class="card-body" id="orderSummary">
+        <!-- Summary will be injected here -->
+      </div>
+    </div>
+
+    <!-- Delivery Address Form -->
+    <div class="card">
+      <div class="card-header">Dirección de entrega</div>
+      <div class="card-body">
+        <form id="deliveryForm">
+          <div class="form-group">
+            <label for="addressStreet">Calle</label>
+            <input type="text" id="addressStreet" name="addressStreet" placeholder="Ej: Calle Principal" required>
+          </div>
+          <div class="form-group inline">
+            <div>
+              <label for="addressNumber">Número</label>
+              <input type="text" id="addressNumber" name="addressNumber" placeholder="123" required>
+            </div>
+            <div>
+              <label for="addressCommune">Comuna</label>
+              <input type="text" id="addressCommune" name="addressCommune" placeholder="Ej: Providencia" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="addressCity">Ciudad</label>
+            <select id="addressCity" name="addressCity" required>
+              <option value="">Selecciona una ciudad</option>
+              <option value="Santiago">Santiago</option>
+              <option value="Concepción">Concepción</option>
+              <option value="Valparaíso">Valparaíso</option>
+              <option value="Viña del Mar">Viña del Mar</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="addressInstructions">Instrucciones especiales (opcional)</label>
+            <textarea id="addressInstructions" name="addressInstructions" placeholder="Ej: Dejar con el conserje, timbre roto, etc." rows="3"></textarea>
+          </div>
+          <!-- El botón de confirmación será generado dinámicamente por JS -->
+        </form>
+      </div>
+    </div>
+
+    <!-- Payment Method -->
+    <div class="card">
+      <div class="card-header">Método de pago</div>
+      <div class="card-body">
+        <div style="margin-bottom: var(--spacing-lg);">
+          <label style="display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); border: 2px solid var(--color-primary); border-radius: var(--border-radius-sm); cursor: pointer; background: rgba(166, 107, 58, 0.05);">
+            <input type="radio" name="paymentMethod" value="credit-card" checked>
+            <span>
+              <strong>Tarjeta de Crédito/Débito</strong>
+              <br>
+              <small>Visa, Mastercard, American Express</small>
+            </span>
+          </label>
+        </div>
+
+        <div style="margin-bottom: var(--spacing-lg);">
+          <label style="display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); border: 2px solid rgba(0,0,0,0.1); border-radius: var(--border-radius-sm); cursor: pointer;">
+            <input type="radio" name="paymentMethod" value="transfer">
+            <span>
+              <strong>Transferencia Bancaria</strong>
+              <br>
+              <small>Recibimos tu pago en 1-2 horas</small>
+            </span>
+          </label>
+        </div>
+
+        <div>
+          <label style="display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); border: 2px solid rgba(0,0,0,0.1); border-radius: var(--border-radius-sm); cursor: pointer;">
+            <input type="radio" name="paymentMethod" value="cash">
+            <span>
+              <strong>Efectivo contra entrega</strong>
+              <br>
+              <small>Paga cuando recibas tu pedido</small>
+            </span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card Details (shown only for credit card) -->
+    <div class="card" id="cardDetailsCard" style="display: none;">
+      <div class="card-header">Datos de la tarjeta</div>
+      <div class="card-body">
+        <div class="form-group">
+          <label for="cardholderName">Nombre del titular</label>
+          <input type="text" id="cardholderName" placeholder="Juan Pérez" required>
+        </div>
+
+        <div class="form-group">
+          <label for="cardNumber">Número de tarjeta</label>
+          <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+        </div>
+
+        <div class="form-group inline">
+          <div>
+            <label for="cardExpiry">Vencimiento</label>
+            <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" required>
+          </div>
+          <div>
+            <label for="cardCVC">CVV</label>
+            <input type="text" id="cardCVC" placeholder="123" maxlength="3" required>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terms & Conditions -->
+    <div class="card">
+      <label style="display: flex; align-items: flex-start; gap: var(--spacing-md);">
+        <input type="checkbox" id="termsAgreed" required style="width: auto; margin: 8px 0;">
+        <span style="flex: 1;">
+          He leído y acepto los <a href="#" onclick="alert('Términos y condiciones'); return false;">términos y condiciones</a> y la <a href="#" onclick="alert('Política de privacidad'); return false;">política de privacidad</a>
+        </span>
+      </label>
+    </div>
+
+    <!-- Final Summary -->
+    <div class="price-summary">
+      <div class="price-row">
+        <span>Subtotal:</span>
+        <span id="finalSubtotal">$0</span>
+      </div>
+      <div class="price-row">
+        <span>Envío:</span>
+        <span id="finalShipping">$2.990</span>
+      </div>
+      <div class="price-row">
+        <span>Código de descuento:</span>
+        <input type="text" id="discountCode" placeholder="Código promocional" style="max-width:140px;">
+        <button type="button" class="btn btn-sm btn-primary" onclick="applyDiscount()">Aplicar</button>
+      </div>
+      <div class="price-row" id="discountRow" style="display:none; color:var(--color-success);">
+        <span>Descuento aplicado (25%):</span>
+        <span id="discountAmount">-$0</span>
+      </div>
+      <div class="price-row total">
+        <span>TOTAL:</span>
+        <span id="finalTotal">$0</span>
+      </div>
+    </div>
+
+    <!-- Resumen y botón de confirmación generado por JS -->
+    <div id="checkoutSummary"></div>
+
+    <!-- Action Buttons -->
+    <button class="btn btn-primary btn-block" id="confirmBtn" onclick="confirmOrder()" style="margin-bottom: var(--spacing-md);">
+      ✓ Confirmar Pedido
+    </button>
+    <button class="btn btn-secondary btn-block" style="margin-bottom: var(--spacing-2xl);" onclick="goBack()">
+      ← Volver al carrito
+    </button>
+  </main>
+
+  <!-- Success Modal -->
+  <div class="modal-overlay" id="successModal">
+    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: var(--border-radius); padding: var(--spacing-xl); max-width: 320px; text-align: center; z-index: 9999; box-shadow: 0 4px 32px rgba(0,0,0,0.18);">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg);">✅</div>
+      <h2 style="margin-bottom: var(--spacing-md);">¡Pago exitoso!</h2>
+      <p style="margin-bottom: var(--spacing-md);">Tu pedido ha sido confirmado.</p>
+      <div id="trackingInfo" style="margin-bottom: var(--spacing-lg); font-size: 1.1rem; color: var(--color-primary); font-weight: bold;"></div>
+      <button class="btn btn-primary btn-block" onclick="goToOrders()">
+        Ver mis pedidos
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Modal -->
+  <div class="modal-overlay" id="errorModal" onclick="closeError()"></div>
+  <div class="modal" id="errorModalContent">
+    <div class="modal-header">
+      <h2>Error</h2>
+      <button class="close-btn" onclick="closeError()">✕</button>
+    </div>
+    <div class="modal-body" id="errorMessage">
+      <!-- Error message will be injected here -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary btn-block" onclick="closeError()">Aceptar</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    // Show/hide card details based on payment method
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const cardDetailsCard = document.getElementById('cardDetailsCard');
+        if (e.target.value === 'credit-card') {
+          cardDetailsCard.style.display = 'block';
+        } else {
+          cardDetailsCard.style.display = 'none';
+        }
+      });
+    });
+
+    function init() {
+      renderOrderSummary();
+      updateFinalSummary();
+    }
+
+    function renderOrderSummary() {
+      if (!window.cart || window.cart.items.length === 0) {
+        window.location.href = 'B10_Carrito_de_Compras.html';
+        return;
+      }
+
+      const summary = document.getElementById('orderSummary');
+      const items = window.cart.items;
+
+      summary.innerHTML = items.map(item => `
+        <div class="list-item" style="padding: var(--spacing-md) 0;">
+          <div class="list-item-content">
+            <div class="list-item-name">${item.name}</div>
+            <div class="list-item-description">
+              $${item.price.toLocaleString('es-CL')} × ${item.quantity}
+            </div>
+          </div>
+          <div class="list-item-price">
+            $${(item.price * item.quantity).toLocaleString('es-CL')}
+          </div>
+        </div>
+      `).join('') + `
+        <div style="border-top: 2px solid rgba(0,0,0,0.1); padding-top: var(--spacing-md); margin-top: var(--spacing-md);">
+          <div class="list-item" style="padding: 0;">
+            <div class="list-item-content">
+              <strong>TOTAL</strong>
+            </div>
+            <div class="list-item-price" style="font-size: 1.3rem;">
+              $${(window.cart.getTotal() + 2990).toLocaleString('es-CL')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateFinalSummary() {
+      const subtotal = window.cart.getTotal();
+      const shipping = 2990;
+      let discount = 0;
+      if (window.discountApplied) {
+        discount = Math.round((subtotal + shipping) * 0.25);
+      }
+      const total = subtotal + shipping - discount;
+
+      document.getElementById('finalSubtotal').textContent = `$${subtotal.toLocaleString('es-CL')}`;
+      document.getElementById('finalShipping').textContent = `$${shipping.toLocaleString('es-CL')}`;
+      document.getElementById('finalTotal').textContent = `$${total.toLocaleString('es-CL')}`;
+      document.getElementById('discountAmount').textContent = `-$${discount.toLocaleString('es-CL')}`;
+      document.getElementById('discountRow').style.display = window.discountApplied ? 'flex' : 'none';
+    }
+
+    function goBack() {
+      window.location.href = 'B10_Carrito_de_Compras.html';
+    }
+
+    function confirmOrder() {
+      // Validate form
+      const form = document.getElementById('deliveryForm');
+      const terms = document.getElementById('termsAgreed');
+      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+
+      if (!form.checkValidity()) {
+        showError('Por favor completa todos los campos requeridos.');
+        return;
+      }
+
+      if (!terms.checked) {
+        showError('Debes aceptar los términos y condiciones para continuar.');
+        return;
+      }
+
+      if (paymentMethod.value === 'credit-card') {
+        const cardForm = ['cardholderName', 'cardNumber', 'cardExpiry', 'cardCVC'].every(id =>
+          document.getElementById(id).value.trim()
+        );
+        if (!cardForm) {
+          showError('Por favor completa los datos de la tarjeta');
+          return;
+        }
+      }
+
+      const confirmBtn = document.getElementById('confirmBtn');
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = '⏳ Procesando...';
+
+      const subtotal = window.cart.getTotal();
+      const shipping = 2990;
+      let discount = 0;
+      if (window.discountApplied) {
+        discount = Math.round((subtotal + shipping) * 0.25);
+      }
+      const total = subtotal + shipping - discount;
+      const orderItems = window.cart.items.map(item => ({
+        product: item.id || item._id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        subtotal: item.price * item.quantity
+      }));
+
+      const orderData = {
+        items: orderItems,
+        deliveryAddress: {
+          street: document.getElementById('addressStreet').value,
+          number: document.getElementById('addressNumber').value,
+          commune: document.getElementById('addressCommune').value,
+          city: document.getElementById('addressCity').value,
+          instructions: document.getElementById('addressInstructions').value
+        },
+        paymentMethod: paymentMethod.value,
+        subtotal,
+        deliveryFee: shipping,
+        discount,
+        total,
+        discountCode: window.discountApplied ? '25MRSNDWCH' : '',
+        orderDate: new Date().toISOString()
+      };
+
+      console.log('Datos del pedido a enviar:', orderData);
+      console.log('Descuento calculado:', discount, 'Aplicado:', window.discountApplied);
+
+      // Enviar pedido al backend
+      window.api.orders.create(orderData)
+        .then(order => {
+          // Limpiar carrito
+          window.cart.clearCart();
+
+          // Mostrar modal de éxito con número de seguimiento real
+          const successModal = document.getElementById('successModal');
+          const trackingInfo = document.getElementById('trackingInfo');
+          trackingInfo.textContent = `N° de seguimiento: ${order.orderNumber || order._id}`;
+          successModal.style.display = 'block';
+          successModal.style.background = 'rgba(0,0,0,0.35)';
+
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = '✓ Confirmar Pedido';
+        })
+        .catch(err => {
+          showError('Error al registrar el pedido. Intenta nuevamente.');
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = '✓ Confirmar Pedido';
+        });
+    }
+
+    function showError(message) {
+      const errorModal = document.getElementById('errorModal');
+      const errorModalContent = document.getElementById('errorModalContent');
+      const errorMessage = document.getElementById('errorMessage');
+      errorMessage.textContent = message;
+      errorModal.style.display = 'block';
+      errorModal.classList.add('show');
+      errorModalContent.style.display = 'block';
+      errorModalContent.classList.add('show');
+    }
+
+    function closeError() {
+      const errorModal = document.getElementById('errorModal');
+      const errorModalContent = document.getElementById('errorModalContent');
+      errorModal.classList.remove('show');
+      errorModal.style.display = 'none';
+      errorModalContent.classList.remove('show');
+      errorModalContent.style.display = 'none';
+    }
+
+    function showSuccess(message) {
+      // Create toast notification
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--color-success);
+        color: white;
+        padding: var(--spacing-md) var(--spacing-lg);
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        animation: slideIn 0.3s ease;
+      `;
+      toast.innerHTML = `<span>✓</span><span>${message}</span>`;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function closeSuccess() {
+      // Not needed for toast, keeping for compatibility
+    }
+
+    function goToOrders() {
+      window.location.href = 'B06_Historial_Pedidos.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+    // Descuento
+    window.discountApplied = false;
+    function applyDiscount() {
+      const code = document.getElementById('discountCode').value.trim();
+      console.log('Aplicando descuento con código:', code);
+      if (code === '25MRSNDWCH') {
+        window.discountApplied = true;
+        console.log('Descuento aplicado! window.discountApplied =', window.discountApplied);
+        updateFinalSummary();
+        showSuccess('¡Descuento aplicado!');
+      } else {
+        window.discountApplied = false;
+        updateFinalSummary();
+        showError('Código inválido');
+      }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Perfil de Usuario | Mr. Sandwich</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="index.html" class="brand-icon" style="text-decoration: none; color: inherit;">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Sabor que te acompaña</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" onclick="logout()">🚪</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Profile Header -->
+    <section style="margin: var(--spacing-xl) 0; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg); color: var(--brand-brown);">👤</div>
+      <h1 style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark);">Mi Perfil</h1>
+      <p style="font-size: 1rem; margin-bottom: var(--spacing-xl); color: rgba(43,43,43,0.7);">
+        Gestiona tu información personal
+      </p>
+    </section>
+
+    <!-- Loading State -->
+    <div id="loadingState" style="text-align: center; padding: var(--spacing-2xl); display: none;">
+      <div style="font-size: 2rem; margin-bottom: var(--spacing-lg);">⏳</div>
+      <p style="color: rgba(43,43,43,0.7);">Cargando perfil...</p>
+    </div>
+
+    <!-- Profile Form -->
+    <section id="profileSection" style="max-width: 500px; margin: 0 auto var(--spacing-2xl) auto; display: none;">
+      <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-xl); box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1); border: 2px solid rgba(166, 107, 58, 0.1);">
+        <form id="profileForm">
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Nombre completo</label>
+            <input id="name" name="name" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem; transition: border-color 0.3s;" required>
+          </div>
+
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Correo electrónico</label>
+            <input id="email" name="email" type="email" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem; transition: border-color 0.3s; background: #f8f9fa;" readonly>
+            <small style="color: rgba(43,43,43,0.6); font-size: 0.9rem;">El correo no se puede modificar</small>
+          </div>
+
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Teléfono</label>
+            <input id="phone" name="phone" type="tel" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem; transition: border-color 0.3s;" placeholder="+569 1234 5678">
+          </div>
+
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Dirección</label>
+           </div>
+
+          <div id="msg" style="margin-bottom: var(--spacing-lg);"></div>
+
+          <div style="display: flex; gap: var(--spacing-md);">
+            <button id="editBtn" type="button" style="flex: 1; background: var(--brand-beige); color: var(--brand-brown-dark); border: 2px solid var(--brand-brown); padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+              Editar
+            </button>
+            <button id="saveBtn" type="submit" style="flex: 1; background: var(--brand-brown); color: white; border: none; padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s; display: none;">
+              Guardar
+            </button>
+          </div>
+        </form>
+
+        <!-- Account Actions -->
+        <div style="margin-top: var(--spacing-xl); padding-top: var(--spacing-lg); border-top: 1px solid #e1e5e9;">
+          <h3 style="margin-bottom: var(--spacing-lg); color: var(--brand-brown-dark); font-size: 1.1rem;">Acciones de cuenta</h3>
+
+          <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+            <button onclick="changePassword()" style="width: 100%; background: var(--brand-green); color: white; border: none; padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s; box-shadow: 0 4px 12px rgba(39, 150, 91, 0.3);">
+              Cambiar contraseña
+            </button>
+
+            <button onclick="logout()" style="width: 100%; background: var(--brand-red); color: white; border: none; padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s; box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);">
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Not Logged In State -->
+    <section id="notLoggedIn" style="text-align: center; padding: var(--spacing-2xl); display: none;">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg);">🔒</div>
+      <h2 style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark);">Acceso requerido</h2>
+      <p style="margin-bottom: var(--spacing-xl); color: rgba(43,43,43,0.7);">
+        Debes iniciar sesión para ver tu perfil
+      </p>
+      <a href="B01_Inicio_Sesion.html" style="background: var(--brand-brown); color: white; padding: var(--spacing-md) var(--spacing-xl); border-radius: var(--border-radius); text-decoration: none; font-weight: 600; display: inline-block; box-shadow: 0 4px 12px rgba(166, 107, 58, 0.3);">
+        Iniciar sesión
+      </a>
+    </section>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center; padding: var(--spacing-lg);">
+      <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-xl); max-width: 400px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+        <h2 style="margin-bottom: var(--spacing-lg); color: var(--brand-brown-dark); text-align: center;">Cambiar contraseña</h2>
+        
+        <form id="changePasswordForm">
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Contraseña actual</label>
+            <input id="changeCurrentPassword" type="password" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem;" required>
+          </div>
+
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Nueva contraseña</label>
+            <input id="changeNewPassword" type="password" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem;" required minlength="6">
+            <small style="color: rgba(43,43,43,0.6); font-size: 0.9rem;">Mínimo 6 caracteres</small>
+          </div>
+
+          <div style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--brand-brown-dark);">Confirmar contraseña</label>
+            <input id="changeConfirmPassword" type="password" style="width: 100%; padding: var(--spacing-md); border: 2px solid #e1e5e9; border-radius: var(--border-radius); font-size: 1rem;" required minlength="6">
+          </div>
+
+          <div id="passwordMsg" style="margin-bottom: var(--spacing-lg);"></div>
+
+          <div style="display: flex; gap: var(--spacing-md);">
+            <button type="button" onclick="closePasswordModal()" style="flex: 1; background: #e1e5e9; color: #2b2b2b; border: none; padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer;">
+              Cancelar
+            </button>
+            <button type="submit" style="flex: 1; background: var(--brand-green); color: white; border: none; padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(39, 150, 91, 0.3);">
+              Cambiar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="index.html">
+      <span class="icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="B07_Catalogo.html">
+      <span class="icon">🥘</span>
+      <span>Catálogo</span>
+    </a>
+    <a href="B10_Carrito_de_Compras.html">
+      <span class="icon">🛒</span>
+      <span>Carrito</span>
+    </a>
+    <a href="B04_Perfil_Usuario.html" class="active">
+      <span class="icon">👤</span>
+      <span>Perfil</span>
+    </a>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let isEditing = false;
+    let currentUser = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Profile page loaded');
+      loadProfile();
+    });
+
+    async function loadProfile() {
+      const loadingState = document.getElementById('loadingState');
+      const profileSection = document.getElementById('profileSection');
+      const notLoggedIn = document.getElementById('notLoggedIn');
+
+      loadingState.style.display = 'block';
+      profileSection.style.display = 'none';
+      notLoggedIn.style.display = 'none';
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // Si no hay token, mostrar mensaje de acceso requerido
+        loadingState.style.display = 'none';
+        document.getElementById('notLoggedIn').style.display = 'block';
+        return;
+      }
+
+      try {
+        const data = await window.api.getProfile();
+        currentUser = data.user;
+        populateForm(data.user);
+        loadingState.style.display = 'none';
+        profileSection.style.display = 'block';
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        // Si el token es inválido, mostrar mensaje de acceso requerido
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        loadingState.style.display = 'none';
+        document.getElementById('notLoggedIn').style.display = 'block';
+      }
+    }
+
+    function populateForm(user) {
+      const nameInput = document.getElementById('name');
+      const emailInput = document.getElementById('email');
+      const phoneInput = document.getElementById('phone');
+      if (nameInput) nameInput.value = user.name || '';
+      if (emailInput) emailInput.value = user.email || '';
+      if (phoneInput) phoneInput.value = user.phone || '';
+
+      // Handle address - take first address if available
+      const addressInput = document.getElementById('address');
+      const address = user.addresses && user.addresses.length > 0 ? user.addresses[0] : {};
+      const addressString = [address.street, address.number, address.city].filter(Boolean).join(', ');
+      if (addressInput) addressInput.value = addressString;
+
+      setFormReadOnly(true);
+    }
+
+    function setFormReadOnly(readOnly) {
+      const inputs = ['name', 'phone', 'address'];
+      inputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+          input.readOnly = readOnly;
+          input.style.background = readOnly ? '#f8f9fa' : 'white';
+        }
+      });
+    }
+
+    document.getElementById('editBtn').addEventListener('click', function() {
+      isEditing = !isEditing;
+      const editBtn = document.getElementById('editBtn');
+      const saveBtn = document.getElementById('saveBtn');
+
+      if (isEditing) {
+        setFormReadOnly(false);
+        editBtn.textContent = 'Cancelar';
+        editBtn.style.background = '#dc3545';
+        editBtn.style.color = 'white';
+        saveBtn.style.display = 'block';
+      } else {
+        setFormReadOnly(true);
+        editBtn.textContent = 'Editar';
+        editBtn.style.background = 'var(--brand-beige)';
+        editBtn.style.color = 'var(--brand-brown-dark)';
+        saveBtn.style.display = 'none';
+        // Reset form to original values
+        populateForm(currentUser);
+      }
+    });
+
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const msgEl = document.getElementById('msg');
+      msgEl.innerHTML = '';
+
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+
+      if (!name) {
+        msgEl.innerHTML = '<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc;">El nombre es obligatorio.</div>';
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/users/profile', {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, phone })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          currentUser = { ...currentUser, name, phone };
+          localStorage.setItem('user', JSON.stringify(currentUser));
+
+          msgEl.innerHTML = '<div style="background: #efe; color: #363; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #cfc;">Perfil actualizado exitosamente.</div>';
+
+          // Exit edit mode
+          isEditing = false;
+          setFormReadOnly(true);
+          document.getElementById('editBtn').textContent = 'Editar';
+          document.getElementById('editBtn').style.background = 'var(--brand-beige)';
+          document.getElementById('editBtn').style.color = 'var(--brand-brown-dark)';
+          document.getElementById('saveBtn').style.display = 'none';
+        } else {
+          const errorMessage = data.error || data.message || 'Error al actualizar perfil';
+          msgEl.innerHTML = `<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc;">${errorMessage}</div>`;
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        msgEl.innerHTML = '<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc;">Error de conexión. Inténtalo de nuevo.</div>';
+      }
+    });
+
+    function changePassword() {
+      const modal = document.getElementById('changePasswordModal');
+      modal.style.display = 'flex';
+      document.getElementById('changePasswordForm').reset();
+      document.getElementById('passwordMsg').innerHTML = '';
+    }
+
+    function closePasswordModal() {
+      document.getElementById('changePasswordModal').style.display = 'none';
+    }
+
+    document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const msgEl = document.getElementById('passwordMsg');
+      msgEl.innerHTML = '';
+
+      const currentPassword = document.getElementById('changeCurrentPassword').value;
+      const newPassword = document.getElementById('changeNewPassword').value;
+      const confirmPassword = document.getElementById('changeConfirmPassword').value;
+
+      if (newPassword !== confirmPassword) {
+        msgEl.innerHTML = '<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc; font-size: 0.9rem;">Las contraseñas no coinciden</div>';
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        msgEl.innerHTML = '<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc; font-size: 0.9rem;">La contraseña debe tener al menos 6 caracteres</div>';
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/auth/change-password', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ currentPassword, newPassword })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          msgEl.innerHTML = '<div style="background: #efe; color: #363; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #cfc; font-size: 0.9rem;">Contraseña actualizada exitosamente</div>';
+          setTimeout(() => {
+            closePasswordModal();
+          }, 2000);
+        } else {
+          const errorMessage = data.message || 'Error al cambiar contraseña';
+          msgEl.innerHTML = `<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc; font-size: 0.9rem;">${errorMessage}</div>`;
+        }
+      } catch (error) {
+        console.error('Error changing password:', error);
+        msgEl.innerHTML = '<div style="background: #fee; color: #c33; padding: var(--spacing-md); border-radius: var(--border-radius); border: 1px solid #fcc; font-size: 0.9rem;">Error de conexión. Inténtalo de nuevo.</div>';
+      }
+    });
+
+    // Cerrar modal al hacer clic fuera
+    document.getElementById('changePasswordModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closePasswordModal();
+      }
+    });
+
+    function logout() {
+      if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'index.html';
+      }
+    }
+  </script>
+</body>
+</html>

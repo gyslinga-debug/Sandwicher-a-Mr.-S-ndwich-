@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Boleta Digital | Mr. Sandwich</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/mobile.css">
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; }
+      .receipt-container { box-shadow: none !important; border: 1px solid #ddd !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header (no print) -->
+  <header class="app-header no-print">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="index.html" class="brand-icon" style="text-decoration: none; color: inherit;">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Boleta Digital</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" onclick="window.history.back()">←</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Loading State -->
+    <div id="loadingState" style="text-align: center; padding: var(--spacing-2xl);">
+      <div style="font-size: 2rem; margin-bottom: var(--spacing-lg);">⏳</div>
+      <p style="color: rgba(43,43,43,0.7);">Cargando boleta...</p>
+    </div>
+
+    <!-- Receipt Container -->
+    <section id="receiptSection" class="receipt-container" style="max-width: 600px; margin: var(--spacing-xl) auto; background: white; border-radius: var(--border-radius); padding: var(--spacing-2xl); box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1); border: 2px solid rgba(166, 107, 58, 0.1); display: none;">
+      <!-- Company Header -->
+      <div style="text-align: center; margin-bottom: var(--spacing-xl); padding-bottom: var(--spacing-lg); border-bottom: 2px solid var(--brand-brown);">
+        <img src="assets/images/logo.png" alt="Mr. Sandwich" style="width: 100px; height: 100px; margin: 0 auto var(--spacing-md); display: block; object-fit: contain;">
+        <h1 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-xs); font-size: 1.8rem;">Mr. Sandwich</h1>
+        <p style="color: rgba(43,43,43,0.7); font-size: 0.95rem; margin: 0;">Sabor que te acompaña</p>
+        <p style="color: rgba(43,43,43,0.6); font-size: 0.85rem; margin-top: var(--spacing-xs);">RUT: 76.XXX.XXX-X</p>
+      </div>
+
+      <!-- Receipt Info -->
+      <div style="background: var(--brand-beige); border-radius: var(--border-radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-sm);">
+          <strong style="color: var(--brand-brown-dark);">Boleta Nº:</strong>
+          <span id="orderNumber" style="font-weight: 600;"></span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-sm);">
+          <strong style="color: var(--brand-brown-dark);">Fecha:</strong>
+          <span id="orderDate"></span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <strong style="color: var(--brand-brown-dark);">Estado:</strong>
+          <span id="orderStatus"></span>
+        </div>
+      </div>
+
+      <!-- Customer Info -->
+      <div style="margin-bottom: var(--spacing-xl);">
+        <h3 style="color: var(--brand-brown-dark); font-size: 1.1rem; margin-bottom: var(--spacing-md); border-bottom: 1px solid #e1e5e9; padding-bottom: var(--spacing-sm);">Datos del Cliente</h3>
+        <div id="customerInfo" style="font-size: 0.95rem; color: rgba(43,43,43,0.8);"></div>
+      </div>
+
+      <!-- Items Table -->
+      <div style="margin-bottom: var(--spacing-xl);">
+        <h3 style="color: var(--brand-brown-dark); font-size: 1.1rem; margin-bottom: var(--spacing-md); border-bottom: 1px solid #e1e5e9; padding-bottom: var(--spacing-sm);">Detalle del Pedido</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #f8f9fa; border-bottom: 2px solid #e1e5e9;">
+              <th style="padding: var(--spacing-sm); text-align: left; font-weight: 600; color: var(--brand-brown-dark);">Producto</th>
+              <th style="padding: var(--spacing-sm); text-align: center; font-weight: 600; color: var(--brand-brown-dark);">Cant.</th>
+              <th style="padding: var(--spacing-sm); text-align: right; font-weight: 600; color: var(--brand-brown-dark);">Precio</th>
+              <th style="padding: var(--spacing-sm); text-align: right; font-weight: 600; color: var(--brand-brown-dark);">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="itemsTable">
+            <!-- Items will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Totals -->
+      <div style="background: #f8f9fa; border-radius: var(--border-radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-sm); font-size: 0.95rem;">
+          <span>Subtotal:</span>
+          <span id="subtotal" style="font-weight: 600;"></span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-sm); font-size: 0.95rem;">
+          <span>Envío:</span>
+          <span id="delivery" style="font-weight: 600;"></span>
+        </div>
+        <div id="discountRow" style="display: none; margin-bottom: var(--spacing-md); padding-bottom: var(--spacing-md); border-bottom: 1px solid #ddd;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.95rem; color: var(--color-success);">
+            <span>Descuento (<span id="discountCode"></span>):</span>
+            <span id="discount" style="font-weight: 600;"></span>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 1.3rem; color: var(--brand-brown-dark); padding-top: var(--spacing-sm); border-top: 1px solid #ddd;">
+          <strong>TOTAL:</strong>
+          <strong id="total"></strong>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="text-align: center; padding-top: var(--spacing-lg); border-top: 2px solid var(--brand-brown); color: rgba(43,43,43,0.6); font-size: 0.85rem;">
+        <p style="margin-bottom: var(--spacing-xs);">¡Gracias por tu compra!</p>
+        <p style="margin: 0;">www.mrsandwich.cl | contacto@mrsandwich.cl</p>
+      </div>
+
+      <!-- Action Buttons (no print) -->
+      <div class="no-print" style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-xl); padding-top: var(--spacing-lg); border-top: 1px solid #e1e5e9;">
+        <button onclick="window.print()" style="flex: 1; background: var(--brand-brown); color: white; border: none; padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(166, 107, 58, 0.3);">
+          🖨️ Imprimir
+        </button>
+        <button onclick="window.history.back()" style="flex: 1; background: var(--brand-beige); color: var(--brand-brown-dark); border: 2px solid var(--brand-brown); padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer;">
+          Volver
+        </button>
+      </div>
+    </section>
+
+    <!-- Error State -->
+    <div id="errorState" style="text-align: center; padding: var(--spacing-2xl); display: none;">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg);">❌</div>
+      <h3 style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark);">Error al cargar la boleta</h3>
+      <p style="color: rgba(43,43,43,0.7); margin-bottom: var(--spacing-xl);">
+        No se pudo encontrar el pedido solicitado
+      </p>
+      <button onclick="window.history.back()" style="background: var(--brand-brown); color: white; border: none; padding: var(--spacing-md) var(--spacing-xl); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(166, 107, 58, 0.3);">
+        Volver
+      </button>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderId = urlParams.get('orderId') || urlParams.get('id');
+      
+      // Si viene desde la caja virtual, usar los datos de localStorage
+      const lastSale = localStorage.getItem('lastSale');
+      
+      if (orderId) {
+        loadReceipt(orderId);
+      } else if (lastSale) {
+        loadReceiptFromLocalStorage(JSON.parse(lastSale));
+      } else {
+        showError();
+      }
+    });
+
+    function loadReceiptFromLocalStorage(saleData) {
+      const loadingState = document.getElementById('loadingState');
+      const receiptSection = document.getElementById('receiptSection');
+      
+      try {
+        // Fill receipt data
+        document.getElementById('orderNumber').textContent = '#' + saleData.orderId.slice(-6).toUpperCase();
+        
+        const date = new Date(saleData.date).toLocaleDateString('es-CL', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        document.getElementById('orderDate').textContent = date;
+        document.getElementById('orderStatus').textContent = 'Completado';
+
+        // Customer info
+        const customerInfo = document.getElementById('customerInfo');
+        customerInfo.innerHTML = `
+          <div><strong>Tipo:</strong> Venta en Punto de Venta</div>
+          <div><strong>Método de Pago:</strong> ${saleData.paymentMethod === 'efectivo' ? 'Efectivo' : saleData.paymentMethod === 'debito' ? 'Débito' : 'Crédito'}</div>
+          ${saleData.paymentMethod === 'efectivo' ? `
+            <div><strong>Efectivo Recibido:</strong> $${saleData.cashReceived.toLocaleString('es-CL')}</div>
+            <div><strong>Vuelto:</strong> $${saleData.change.toLocaleString('es-CL')}</div>
+          ` : ''}
+        `;
+
+        // Items
+        const itemsTable = document.getElementById('itemsTable');
+        itemsTable.innerHTML = saleData.items.map(item => `
+          <tr style="border-bottom: 1px solid #e1e5e9;">
+            <td style="padding: var(--spacing-sm);">${item.product.name}</td>
+            <td style="padding: var(--spacing-sm); text-align: center;">${item.quantity}</td>
+            <td style="padding: var(--spacing-sm); text-align: right;">$${item.product.price.toLocaleString('es-CL')}</td>
+            <td style="padding: var(--spacing-sm); text-align: right; font-weight: 600;">$${(item.product.price * item.quantity).toLocaleString('es-CL')}</td>
+          </tr>
+        `).join('');
+
+        // Totals
+        document.getElementById('subtotal').textContent = `$${saleData.total.toLocaleString('es-CL')}`;
+        document.getElementById('delivery').textContent = 'No aplica';
+        document.getElementById('discountRow').style.display = 'none';
+        document.getElementById('total').textContent = `$${saleData.total.toLocaleString('es-CL')}`;
+
+        // Show receipt
+        loadingState.style.display = 'none';
+        receiptSection.style.display = 'block';
+        
+        // Limpiar localStorage después de mostrar
+        localStorage.removeItem('lastSale');
+      } catch (error) {
+        console.error('Error loading receipt from localStorage:', error);
+        showError();
+      }
+    }
+
+    async function loadReceipt(orderId) {
+      const loadingState = document.getElementById('loadingState');
+      const receiptSection = document.getElementById('receiptSection');
+      const errorState = document.getElementById('errorState');
+
+      console.log('Cargando boleta para pedido:', orderId);
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/orders/${orderId}`);
+        
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error('Error response:', errorData);
+          throw new Error('Pedido no encontrado');
+        }
+
+        const order = await response.json();
+        console.log('Pedido cargado:', order);
+        console.log('Descuento en orden:', order.discount, 'Código:', order.discountCode);
+        
+        // Fill receipt data
+        document.getElementById('orderNumber').textContent = order.orderNumber || '#' + order._id.slice(-6).toUpperCase();
+        
+        const date = new Date(order.createdAt).toLocaleDateString('es-CL', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        document.getElementById('orderDate').textContent = date;
+
+        const statusLabels = {
+          pending: 'Pendiente',
+          confirmed: 'Confirmado',
+          preparing: 'En Preparación',
+          ready: 'Listo',
+          delivered: 'Entregado',
+          cancelled: 'Cancelado'
+        };
+        document.getElementById('orderStatus').textContent = statusLabels[order.status] || order.status;
+
+        // Customer info
+        const customerInfo = document.getElementById('customerInfo');
+        if (order.deliveryAddress) {
+          customerInfo.innerHTML = `
+            <div><strong>Dirección:</strong> ${order.deliveryAddress.street || ''} ${order.deliveryAddress.number || ''}</div>
+            ${order.deliveryAddress.city ? `<div><strong>Comuna:</strong> ${order.deliveryAddress.city}</div>` : ''}
+          `;
+        }
+
+        // Items
+        const itemsTable = document.getElementById('itemsTable');
+        itemsTable.innerHTML = order.items.map(item => `
+          <tr style="border-bottom: 1px solid #e1e5e9;">
+            <td style="padding: var(--spacing-sm);">${item.product?.name || item.name || 'Producto'}</td>
+            <td style="padding: var(--spacing-sm); text-align: center;">${item.quantity}</td>
+            <td style="padding: var(--spacing-sm); text-align: right;">$${item.price.toLocaleString('es-CL')}</td>
+            <td style="padding: var(--spacing-sm); text-align: right; font-weight: 600;">$${(item.price * item.quantity).toLocaleString('es-CL')}</td>
+          </tr>
+        `).join('');
+
+        // Totals
+        const subtotal = order.subtotal || order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const deliveryFee = order.deliveryFee || 0;
+        const discount = order.discount || 0;
+        const total = order.total || (subtotal + deliveryFee - discount);
+
+        document.getElementById('subtotal').textContent = `$${subtotal.toLocaleString('es-CL')}`;
+        document.getElementById('delivery').textContent = deliveryFee > 0 ? `$${deliveryFee.toLocaleString('es-CL')}` : 'Gratis';
+        
+        // Show discount if exists
+        if (discount > 0) {
+          document.getElementById('discountRow').style.display = 'block';
+          document.getElementById('discountCode').textContent = order.discountCode || 'DESCUENTO';
+          document.getElementById('discount').textContent = `-$${discount.toLocaleString('es-CL')}`;
+        }
+        
+        document.getElementById('total').textContent = `$${total.toLocaleString('es-CL')}`;
+
+        // Show receipt
+        loadingState.style.display = 'none';
+        receiptSection.style.display = 'block';
+      } catch (error) {
+        console.error('Error loading receipt:', error);
+        showError();
+      }
+    }
+
+    function showError() {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Mr. Sandwich | Inicio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/mobile.css">
+  <style>
+    /* Animaciones inline para index */
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    .fade-in-up {
+      animation: fadeInUp 0.8s ease-out forwards;
+    }
+    
+    .bounce {
+      animation: bounce 2s ease-in-out infinite;
+    }
+    
+    .slide-in-left {
+      animation: slideInLeft 0.8s ease-out 0.3s forwards;
+      opacity: 0;
+    }
+    
+    .slide-in-right {
+      animation: slideInRight 0.8s ease-out 0.5s forwards;
+      opacity: 0;
+    }
+    
+    .scale-in {
+      animation: scaleIn 0.6s ease-out 0.7s forwards;
+      opacity: 0;
+    }
+    
+    .hover-lift {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .hover-lift:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 28px rgba(166, 107, 58, 0.4) !important;
+    }
+    
+    .btn {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      transition: left 0.5s ease;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn > * {
+      position: relative;
+      z-index: 1;
+      color: inherit !important;
+    }
+    
+    .btn:hover {
+      color: inherit !important;
+    }
+    
+    .btn-primary {
+      color: white !important;
+    }
+    
+    .btn-primary:hover {
+      color: white !important;
+    }
+    
+    .card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="index.html" class="brand-icon" style="text-decoration: none; color: inherit;">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Sabor que te acompaña</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" id="userMenuBtn" onclick="toggleUserMenu()">
+          👤
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero Section -->
+    <section class="fade-in-up" style="margin: var(--spacing-xl) 0; text-align: center; position: relative;">
+      <div class="bounce" style="margin-bottom: var(--spacing-lg); text-align: center;">
+        <img src="assets/images/logo.png" alt="Mr. Sandwich" style="width: 150px; height: 150px; margin: 0 auto; display: block; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(166, 107, 58, 0.3));">
+      </div>
+      <h1 class="slide-in-left" style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark); font-size: 2.2rem; line-height: 1.2;">
+        Los mejores sándwiches artesanales
+      </h1>
+      <p class="slide-in-right" style="font-size: 1.1rem; margin-bottom: var(--spacing-xl); color: rgba(43,43,43,0.8); max-width: 500px; margin-left: auto; margin-right: auto;">
+        Ingredientes frescos, panes calientes y sabores que te harán volver por más.
+      </p>
+
+      <div class="scale-in" style="display: flex; flex-direction: column; gap: var(--spacing-md); max-width: 300px; margin: 0 auto;">
+        <a href="B07_Catalogo.html" class="btn btn-primary btn-lg btn-block hover-lift" style="box-shadow: 0 4px 12px rgba(166, 107, 58, 0.3);">
+          🥘 Ver Catálogo Completo
+        </a>
+        <a href="B02_Registro.html" class="btn btn-secondary btn-block" style="border-color: var(--brand-brown); color: var(--brand-brown);">
+          ➕ Crear Cuenta
+        </a>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          if (localStorage.getItem('token')) {
+            var regBtn = document.querySelector('a[href="B02_Registro.html"]');
+            if (regBtn) regBtn.style.display = 'none';
+          }
+        });
+        </script>
+      </div>
+    </section>
+
+    <!-- Admin Quick Access -->
+    <section id="adminQuickAccess" style="display:none; margin: var(--spacing-xl) 0;">
+      <div style="background: var(--brand-beige); border: 2px solid var(--brand-brown); border-radius: var(--border-radius); padding: var(--spacing-xl); text-align: center; box-shadow: 0 4px 16px rgba(166,107,58,0.08);">
+        <h2 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-lg);">Panel de Administración</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-md); justify-content: center;">
+          <a href="B16_Dashboard.html" class="btn btn-primary">📊 Dashboard</a>
+          <a href="B17_Graficos_Ventas.html" class="btn btn-primary">📈 Gráficos de Ventas</a>
+          <a href="B19_Ordenes_Despacho.html" class="btn btn-primary">🚚 Órdenes de Despacho</a>
+          <a href="B13_Caja_Virtual.html" class="btn btn-primary">💵 Caja Virtual</a>
+          <a href="B18_Filtros_Fechas.html" class="btn btn-primary">📅 Filtros por Fecha</a>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var token = localStorage.getItem('token');
+        if (token) {
+          try {
+            var payload = JSON.parse(atob(token.split('.')[1]));
+            if (payload.role === 'admin') {
+              document.getElementById('adminQuickAccess').style.display = 'block';
+            }
+          } catch(e) {}
+        }
+      });
+    </script>
+
+    <!-- Features Section -->
+    <section style="margin: var(--spacing-2xl) 0 var(--spacing-xl) 0;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--spacing-lg); text-align: center;">
+        <div style="padding: var(--spacing-lg); background: linear-gradient(135deg, var(--brand-beige) 0%, #f8f5f0 100%); border-radius: var(--border-radius); border: 2px solid rgba(166, 107, 58, 0.1);">
+          <div style="font-size: 2.5rem; margin-bottom: var(--spacing-md); color: var(--brand-green);">🌱</div>
+          <h3 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-sm);">100% Fresco</h3>
+          <p style="font-size: 0.9rem; color: rgba(43,43,43,0.7);">Ingredientes seleccionados diariamente</p>
+        </div>
+        <div style="padding: var(--spacing-lg); background: linear-gradient(135deg, var(--brand-beige) 0%, #f8f5f0 100%); border-radius: var(--border-radius); border: 2px solid rgba(166, 107, 58, 0.1);">
+          <div style="font-size: 2.5rem; margin-bottom: var(--spacing-md); color: var(--brand-brown);">🏆</div>
+          <h3 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-sm);">Calidad Premium</h3>
+          <p style="font-size: 0.9rem; color: rgba(43,43,43,0.7);">Elaborados con pasión y dedicación</p>
+        </div>
+        <div style="padding: var(--spacing-lg); background: linear-gradient(135deg, var(--brand-beige) 0%, #f8f5f0 100%); border-radius: var(--border-radius); border: 2px solid rgba(166, 107, 58, 0.1);">
+          <div style="font-size: 2.5rem; margin-bottom: var(--spacing-md); color: var(--brand-red);">⚡</div>
+          <h3 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-sm);">Rápido</h3>
+          <p style="font-size: 0.9rem; color: rgba(43,43,43,0.7);">Preparados en minutos</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section style="margin: var(--spacing-2xl) 0; padding: var(--spacing-xl); background: linear-gradient(135deg, var(--brand-brown) 0%, var(--brand-brown-dark) 100%); color: white; border-radius: var(--border-radius); text-align: center; box-shadow: 0 8px 24px rgba(166, 107, 58, 0.3);">
+      <h2 style="margin-bottom: var(--spacing-md); color: white;">¿Preguntas?</h2>
+      <p style="margin-bottom: var(--spacing-lg); opacity: 0.9;">Estamos aquí para ayudarte con tu pedido</p>
+      <a href="tel:+56912345678" class="btn" style="background: var(--brand-green); color: white; border: none; box-shadow: 0 4px 12px rgba(39, 150, 91, 0.3);">
+        📞 +56 9 1234 5678
+      </a>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="index.html" class="active">
+      <span class="icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="B07_Catalogo.html">
+      <span class="icon">🥘</span>
+      <span>Catálogo</span>
+    </a>
+    <a href="B10_Carrito_de_Compras.html">
+      <span class="icon">🛒</span>
+      <span>Carrito</span>
+    </a>
+    <a href="B04_Perfil_Usuario.html">
+      <span class="icon">👤</span>
+      <span>Perfil</span>
+    </a>
+  </nav>
+
+  <!-- User Menu Modal -->
+  <div class="modal-overlay" id="userMenuOverlay" onclick="closeUserMenu()"></div>
+  <div class="modal" id="userMenuModal">
+    <div class="modal-header">
+      <h2>Menú</h2>
+      <button class="close-btn" onclick="closeUserMenu()">✕</button>
+    </div>
+    <div class="modal-body" id="userMenuContent">
+      <!-- Menu will be injected here -->
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    function init() {
+      updateUserMenu();
+    }
+
+    function updateUserMenu() {
+      const content = document.getElementById('userMenuContent');
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+
+      if (token && user) {
+        try {
+          const userData = JSON.parse(user);
+          const payload = JSON.parse(atob(token.split('.')[1]));
+
+          content.innerHTML = `
+            <div style="padding: var(--spacing-lg); text-align: center; border-bottom: 1px solid rgba(0,0,0,0.08);">
+              <div style="font-size: 2.5rem; margin-bottom: var(--spacing-md);">👤</div>
+              <h3 style="margin: 0 0 var(--spacing-sm) 0;">${userData.name || 'Usuario'}</h3>
+              <p style="margin: 0; font-size: 0.9rem; color: rgba(43,43,43,0.6);">${userData.email}</p>
+              ${payload.role === 'admin' ? '<p style="margin: var(--spacing-sm) 0 0 0; font-size: 0.85rem; color: var(--brand-green);"><strong>👑 Administrador</strong></p>' : ''}
+            </div>
+            <div style="padding: var(--spacing-md) 0;">
+              <a href="B04_Perfil_Usuario.html" class="btn btn-block" style="justify-content: flex-start; padding: var(--spacing-md); margin: 0 var(--spacing-lg);">👤 Mi Perfil</a>
+              <a href="B06_Historial_Pedidos.html" class="btn btn-block" style="justify-content: flex-start; padding: var(--spacing-md); margin: var(--spacing-md) var(--spacing-lg);">📦 Mis Pedidos</a>
+              <a href="B05_Direcciones.html" class="btn btn-block" style="justify-content: flex-start; padding: var(--spacing-md); margin: var(--spacing-md) var(--spacing-lg);">📍 Direcciones</a>
+              ${payload.role === 'admin' ? '<a href="B16_Dashboard.html" class="btn btn-block" style="justify-content: flex-start; padding: var(--spacing-md); margin: var(--spacing-md) var(--spacing-lg);">⚙️ Admin Panel</a>' : ''}
+              <button class="btn btn-danger btn-block" style="justify-content: flex-start; padding: var(--spacing-md); margin: var(--spacing-md) var(--spacing-lg);" onclick="logout()">🚪 Cerrar Sesión</button>
+            </div>
+          `;
+        } catch (e) {
+          showGuestMenu();
+        }
+      } else {
+        showGuestMenu();
+      }
+    }
+
+    function showGuestMenu() {
+      const content = document.getElementById('userMenuContent');
+      content.innerHTML = `
+        <div style="padding: var(--spacing-lg); text-align: center;">
+          <p style="margin-bottom: var(--spacing-lg); color: rgba(43,43,43,0.7);">Inicia sesión para ver tu perfil y pedidos</p>
+          <a href="B01_Inicio_Sesion.html" class="btn btn-primary btn-block" style="margin-bottom: var(--spacing-md);">🔐 Iniciar Sesión</a>
+          <a href="B02_Registro.html" class="btn btn-secondary btn-block">➕ Crear Cuenta</a>
+        </div>
+      `;
+    }
+
+    function toggleUserMenu() {
+      const overlay = document.getElementById('userMenuOverlay');
+      const modal = document.getElementById('userMenuModal');
+
+      if (overlay.classList.contains('show')) {
+        closeUserMenu();
+      } else {
+        overlay.classList.add('show');
+        modal.style.display = 'block';
+      }
+    }
+
+    function closeUserMenu() {
+      const overlay = document.getElementById('userMenuOverlay');
+      const modal = document.getElementById('userMenuModal');
+      overlay.classList.remove('show');
+      modal.style.display = 'none';
+    }
+
+    function logout() {
+      if (window.auth) {
+        window.auth.logout();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+  <script src="js/animations.js"></script>
+</body>
+</html>

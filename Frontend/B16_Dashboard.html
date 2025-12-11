@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Dashboard | Mr. Sandwich</title>
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="index.html" class="brand-icon" title="Ir al inicio">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Dashboard Admin</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" onclick="window.history.back()">←</button>
+      </div>
+    </div>
+  </header>
+  <main class="container">
+    <section style="margin: var(--spacing-xl) 0;">
+      <h2 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-lg);">📊 Dashboard Administrativo</h2>
+      
+      <!-- Estadísticas -->
+      <div id="adminStats" class="spinner-container">
+        <div class="spinner"></div>
+        <p>Cargando estadísticas...</p>
+      </div>
+      
+      <!-- Órdenes recientes -->
+      <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-lg); box-shadow: var(--box-shadow); margin-top: var(--spacing-xl);">
+        <h3 style="color: var(--brand-brown-dark); margin-bottom: var(--spacing-md);">Pedidos Recientes</h3>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--brand-beige);">
+                <th style="padding: var(--spacing-md); text-align: left; color: var(--brand-brown-dark);">Pedido</th>
+                <th style="padding: var(--spacing-md); text-align: left; color: var(--brand-brown-dark);">Cliente</th>
+                <th style="padding: var(--spacing-md); text-align: left; color: var(--brand-brown-dark);">Total</th>
+                <th style="padding: var(--spacing-md); text-align: left; color: var(--brand-brown-dark);">Fecha</th>
+              </tr>
+            </thead>
+            <tbody id="recentOrders">
+              <tr>
+                <td colspan="4" style="padding: var(--spacing-xl); text-align: center;">
+                  <div class="spinner"></div>
+                  <p>Cargando pedidos...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Bottom Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="index.html">
+      <span class="icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="B16_Dashboard.html" class="active">
+      <span class="icon">📊</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="B17_Graficos_Ventas.html">
+      <span class="icon">📈</span>
+      <span>Gráficos</span>
+    </a>
+    <a href="B19_Ordenes_Despacho.html">
+      <span class="icon">🚚</span>
+      <span>Despacho</span>
+    </a>
+  </nav>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/animations.js"></script>
+</body>
+</html>

@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Catálogo | Mr. Sandwich</title>
+  <link rel="stylesheet" href="css/mobile.css">
+  <style>
+    /* Animaciones para catálogo */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .card {
+      animation: fadeInUp 0.6s ease-out forwards;
+      opacity: 0;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
+    .card:nth-child(6) { animation-delay: 0.6s; }
+    .card:nth-child(7) { animation-delay: 0.7s; }
+    .card:nth-child(8) { animation-delay: 0.8s; }
+    
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.15) !important;
+    }
+    
+    .card img {
+      transition: transform 0.5s ease;
+    }
+    
+    .card:hover img {
+      transform: scale(1.1) rotate(2deg);
+    }
+    
+    .btn {
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+      pointer-events: none;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(166, 107, 58, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="index.html" class="brand-icon" title="Ir al inicio" style="text-decoration: none; color: inherit;">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Catálogo</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" id="cartBtn" onclick="openCart()">
+          🛒
+          <span class="badge" id="cartBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Search Bar -->
+    <section style="margin: var(--spacing-xl) 0;">
+      <div style="position: relative;">
+        <input 
+          id="searchInput" 
+          type="text" 
+          placeholder="🔍 Buscar productos..." 
+          onkeyup="applyFilters()"
+          style="width: 100%; padding: var(--spacing-md) var(--spacing-lg); padding-right: 100px; border: 2px solid rgba(166, 107, 58, 0.3); border-radius: var(--border-radius); font-size: 1rem; background: white; box-shadow: 0 4px 12px rgba(166, 107, 58, 0.1);">
+        <button 
+          id="clearSearch" 
+          onclick="clearSearch()" 
+          style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: var(--brand-beige); color: var(--brand-brown); border: none; padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--border-radius); font-size: 0.9rem; font-weight: 600; cursor: pointer; display: none;">
+          ✕
+        </button>
+      </div>
+    </section>
+
+    <!-- Filters Toggle Button -->
+    <section style="margin-bottom: var(--spacing-lg);">
+      <button onclick="toggleFilters()" style="width: 100%; background: white; color: var(--brand-brown-dark); border: 2px solid rgba(166, 107, 58, 0.3); padding: var(--spacing-md); border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(166, 107, 58, 0.1);">
+        <span>🎛️ Filtros avanzados</span>
+        <span id="filterToggleIcon">▼</span>
+      </button>
+    </section>
+
+    <!-- Filters Section (Collapsible) -->
+    <section id="filtersSection" style="margin-bottom: var(--spacing-xl); display: none;">
+      <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-lg); box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1); border: 2px solid rgba(166, 107, 58, 0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+          <h3 style="margin: 0; color: var(--brand-brown-dark); font-size: 1.1rem;">Filtrar por:</h3>
+          <button onclick="resetFilters()" style="background: var(--brand-beige); color: var(--brand-brown); border: 2px solid var(--brand-brown); padding: var(--spacing-xs) var(--spacing-sm); border-radius: var(--border-radius); font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+            Limpiar
+          </button>
+        </div>
+
+        <!-- Category Filter -->
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 6px; font-weight: 600; color: #5D4037; font-size: 0.9rem;">Categoría</label>
+          <select id="categoryFilter" onchange="applyFilters()" style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 0.95rem; background: white; cursor: pointer; appearance: auto; -webkit-appearance: menulist;">
+            <option value="">Todas</option>
+            <option value="classics">🥪 Clásicos</option>
+            <option value="pollo">🍗 Pollo</option>
+            <option value="jamón">🥓 Jamón</option>
+            <option value="carne">🥩 Carne</option>
+            <option value="vegano">🥗 Vegano/Vegetariano</option>
+            <option value="especial">⭐ Especiales</option>
+            <option value="premium">💎 Premium</option>
+            <option value="club">🎩 Club</option>
+            <option value="doble">🥪🥪 Doble</option>
+            <option value="bebida">🥤 Bebidas</option>
+            <option value="postre">🍰 Postres</option>
+          </select>
+        </div>
+
+        <!-- Price Range Filter -->
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 6px; font-weight: 600; color: #5D4037; font-size: 0.9rem;">Rango de precio</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <input 
+              id="minPrice" 
+              type="number" 
+              placeholder="Mínimo" 
+              min="0"
+              onchange="applyFilters()"
+              style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 0.95rem;">
+            <input 
+              id="maxPrice" 
+              type="number" 
+              placeholder="Máximo" 
+              min="0"
+              onchange="applyFilters()"
+              style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 0.95rem;">
+          </div>
+        </div>
+
+        <!-- Availability Filter -->
+        <div>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; color: #5D4037; font-size: 0.9rem;">
+            <input id="availableOnly" type="checkbox" onchange="applyFilters()" style="width: 18px; height: 18px; cursor: pointer;">
+            <span>Solo disponibles</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Summary -->
+    <section style="margin-bottom: var(--spacing-lg);">
+      <div id="resultsSummary" style="text-align: center; padding: var(--spacing-sm); background: var(--brand-beige); border-radius: var(--border-radius); font-weight: 600; color: var(--brand-brown-dark); font-size: 0.9rem;"></div>
+    </section>
+
+    <!-- Loading State -->
+    <div class="spinner-container" id="loadingSpinner" style="display: none;">
+      <div class="spinner"></div>
+      <p>Cargando productos...</p>
+    </div>
+
+    <!-- Product Grid -->
+    <div id="productGrid" class="product-grid">
+      <!-- Products will be injected here -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <div class="empty-state-icon">🔍</div>
+      <h3 class="empty-state-title">Sin resultados</h3>
+      <p class="empty-state-message">No encontramos productos que coincidan con tu búsqueda</p>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="index.html" class="active">
+      <span class="icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="B07_Catalogo.html">
+      <span class="icon">🥘</span>
+      <span>Catálogo</span>
+    </a>
+    <a href="B10_Carrito_de_Compras.html">
+      <span class="icon">🛒</span>
+      <span>Carrito</span>
+    </a>
+    <a href="B04_Perfil_Usuario.html">
+      <span class="icon">👤</span>
+      <span>Perfil</span>
+    </a>
+  </nav>
+
+  <!-- Cart Modal -->
+  <div class="modal-overlay" id="cartModal" onclick="closeCart()">
+    <div class="modal" id="cartModalContent" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Carrito</h2>
+        <button class="close-btn" onclick="closeCart()">✕</button>
+      </div>
+      <div class="modal-body" id="cartModalBody">
+        <!-- Cart items will be injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Compra Modal -->
+  <div class="modal-overlay" id="buyModal" style="display:none;">
+    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: var(--border-radius); padding: var(--spacing-xl); max-width: 300px; text-align: center; z-index: 300;">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg);">🥪</div>
+      <h2 style="margin-bottom: var(--spacing-md);">¡Producto agregado!</h2>
+      <p style="margin-bottom: var(--spacing-lg);">¿Quieres finalizar tu compra?</p>
+      <button class="btn btn-primary btn-block" onclick="goToCheckoutFromModal()">Ir a Pagar</button>
+      <button class="btn btn-secondary btn-block" onclick="closeBuyModal()">Seguir comprando</button>
+    </div>
+  </div>
+
+  <!-- Product Detail Modal -->
+  <div class="modal-overlay" id="productDetailModal" style="display:none;" onclick="closeProductDetail()">
+    <div onclick="event.stopPropagation()" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: var(--border-radius); padding: var(--spacing-xl); max-width: 500px; width: 90%; text-align: center; z-index: 300; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+      <button onclick="closeProductDetail()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; transition: color 0.2s;" onmouseover="this.style.color='#333'" onmouseout="this.style.color='#999'">✕</button>
+      
+      <div id="detailIcon" style="font-size: 5rem; margin-bottom: var(--spacing-lg);">🥪</div>
+      <h2 id="detailName" style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark); font-size: 1.8rem;">Nombre del Producto</h2>
+      <p id="detailDescription" style="margin-bottom: var(--spacing-lg); color: rgba(43,43,43,0.7); font-size: 1rem; line-height: 1.6; padding: 0 var(--spacing-md);">Descripción del producto</p>
+      <p id="detailPrice" style="font-size: 2rem; font-weight: 800; color: var(--brand-brown); margin-bottom: var(--spacing-xl);">$0</p>
+      
+      <button id="detailAddBtn" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem;">
+        ➕ Agregar al carrito
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Mock Products (en production, estas vendrían de la API)
+    // Eliminado: productos mock. Solo se usan productos reales de la API.
+
+    let allProducts = [];
+    let filteredProducts = [];
+
+    // Función para asignar emoji distintivo según el nombre del producto
+    function getProductEmoji(productName, category) {
+      const name = productName.toLowerCase();
+      
+      // Emojis específicos por palabras clave
+      if (name.includes('coca-cola') || name.includes('coca cola')) return '🥤';
+      if (name.includes('sprite')) return '🥤';
+      if (name.includes('pollo') || name.includes('chicken')) return '🍗';
+      if (name.includes('carne') || name.includes('beef') || name.includes('parrilla')) return '🥩';
+      if (name.includes('jamón') || name.includes('ham')) return '🥓';
+      if (name.includes('veggie') || name.includes('vegano') || name.includes('vegetales')) return '🥗';
+      if (name.includes('tostado') || name.includes('toast')) return '🍞';
+      if (name.includes('club')) return '🥪';
+      if (name.includes('premium') || name.includes('mixto')) return '👑';
+      if (name.includes('doble') || name.includes('double')) return '🍔';
+      if (name.includes('italiano')) return '🇮🇹';
+      if (name.includes('clásico') || name.includes('classic')) return '🥖';
+      
+      // Por categoría
+      if (category) {
+        const cat = category.toLowerCase();
+        if (cat.includes('bebida')) return '🥤';
+        if (cat.includes('pollo')) return '🍗';
+        if (cat.includes('carne')) return '🥩';
+        if (cat.includes('vegano')) return '🥗';
+        if (cat.includes('premium')) return '👑';
+      }
+      
+      // Default
+      return '🥪';
+    }
+
+    // Load products from API
+    async function loadProductsFromAPI() {
+      try {
+        const products = await window.api.getProducts();
+        if (Array.isArray(products) && products.length > 0) {
+          allProducts = products.map(product => ({
+            id: product._id || product.id,
+            _id: product._id || null,
+            name: product.name,
+            price: product.price,
+            icon: getProductEmoji(product.name, product.category),
+            category: product.category || 'sandwich',
+            description: product.description || '',
+            available: product.available !== false
+          }));
+          filteredProducts = [...allProducts];
+        } else {
+          allProducts = [];
+          filteredProducts = [];
+          alert('No hay productos disponibles. Verifica la conexión con el servidor.');
+        }
+      } catch (error) {
+        allProducts = [];
+        filteredProducts = [];
+        alert('Error al cargar productos desde el servidor.');
+      }
+    }
+
+    // Initialize
+    async function init() {
+      await loadProductsFromAPI();
+      applyFilters();
+      updateCartBadge();
+      
+      // Search input listener
+      document.getElementById('searchInput').addEventListener('input', function(e) {
+        const clearBtn = document.getElementById('clearSearch');
+        clearBtn.style.display = e.target.value ? 'block' : 'none';
+      });
+    }
+
+    // Ejecutar init al cargar la página
+    document.addEventListener('DOMContentLoaded', init);
+
+    function toggleFilters() {
+      const section = document.getElementById('filtersSection');
+      const icon = document.getElementById('filterToggleIcon');
+      if (section.style.display === 'none') {
+        section.style.display = 'block';
+        icon.textContent = '▲';
+      } else {
+        section.style.display = 'none';
+        icon.textContent = '▼';
+      }
+    }
+
+    function applyFilters() {
+      const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
+      const category = document.getElementById('categoryFilter').value.toLowerCase();
+      const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+      const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+      const availableOnly = document.getElementById('availableOnly').checked;
+
+      filteredProducts = allProducts.filter(product => {
+        // Search filter
+        const matchesSearch = !searchText || 
+          product.name.toLowerCase().includes(searchText) ||
+          (product.description && product.description.toLowerCase().includes(searchText)) ||
+          (product.category && product.category.toLowerCase().includes(searchText));
+
+        // Category filter - exact match
+        const matchesCategory = !category || 
+          (product.category && product.category.toLowerCase() === category);
+
+        // Price filter
+        const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
+
+        // Availability filter
+        const matchesAvailability = !availableOnly || product.available;
+
+        return matchesSearch && matchesCategory && matchesPrice && matchesAvailability;
+      });
+
+      loadProducts();
+      updateResultsSummary();
+    }
+
+    function updateResultsSummary() {
+      const summary = document.getElementById('resultsSummary');
+      summary.innerHTML = `Mostrando <strong>${filteredProducts.length}</strong> de ${allProducts.length} productos`;
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('categoryFilter').value = '';
+      document.getElementById('minPrice').value = '';
+      document.getElementById('maxPrice').value = '';
+      document.getElementById('availableOnly').checked = false;
+      document.getElementById('clearSearch').style.display = 'none';
+      applyFilters();
+    }
+
+    function loadProducts() {
+      const grid = document.getElementById('productGrid');
+      const empty = document.getElementById('emptyState');
+
+      if (filteredProducts.length === 0) {
+        grid.style.display = 'none';
+        empty.style.display = 'flex';
+        return;
+      }
+
+      grid.style.display = 'grid';
+      empty.style.display = 'none';
+
+      grid.innerHTML = filteredProducts.map(product => {
+        const available = product.available;
+        return `
+        <div class="product-card" style="${!available ? 'opacity: 0.6;' : ''}; cursor: pointer;" onclick="viewProduct('${product.id}')">
+          <div class="product-card-image">${product.icon}</div>
+          <div class="product-card-body">
+            <h5 class="product-card-name">${product.name}</h5>
+            <p class="product-card-price">$${product.price.toLocaleString('es-CL')}</p>
+            ${!available ? '<p style="color: #dc3545; font-size: 0.85rem; font-weight: 600; margin-top: 8px;">No disponible</p>' : ''}
+            <div class="product-card-actions" onclick="event.stopPropagation()">
+              <button class="btn btn-primary" onclick="addToCart('${product.id}')" ${!available ? 'disabled style="background: #999; cursor: not-allowed;"' : ''} style="width: 100%; padding: 12px; font-size: 1rem;">
+                ${available ? '➕ Agregar al carrito' : '❌ No disponible'}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      }).join('');
+    }
+
+    function filterProducts(query) {
+      applyFilters();
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('clearSearch').style.display = 'none';
+      applyFilters();
+    }
+
+    function addToCart(productId) {
+      const product = allProducts.find(p => String(p.id) === String(productId));
+      if (product && window.cart) {
+        window.cart.addItem(product, 1);
+        updateCartBadge();
+        showBuyModal();
+      }
+    }
+
+  
+    function showBuyModal() {
+      document.getElementById('buyModal').style.display = 'block';
+    }
+  
+    function closeBuyModal() {
+      document.getElementById('buyModal').style.display = 'none';
+    }
+  
+    function goToCheckoutFromModal() {
+      closeBuyModal();
+      window.location.href = 'B11_Checkout.html';
+    }
+    function viewProduct(productId) {
+      const product = allProducts.find(p => String(p.id) === String(productId));
+      if (!product) return;
+      
+      const modal = document.getElementById('productDetailModal');
+      document.getElementById('detailIcon').textContent = product.icon;
+      document.getElementById('detailName').textContent = product.name;
+      document.getElementById('detailDescription').textContent = product.description || 'Delicioso sandwich preparado con ingredientes frescos.';
+      document.getElementById('detailPrice').textContent = `$${product.price.toLocaleString('es-CL')}`;
+      
+      const addBtn = document.getElementById('detailAddBtn');
+      if (product.available) {
+        addBtn.disabled = false;
+        addBtn.textContent = '➕ Agregar al carrito';
+        addBtn.style.background = '';
+        addBtn.style.cursor = '';
+        addBtn.onclick = () => {
+          addToCart(productId);
+          closeProductDetail();
+        };
+      } else {
+        addBtn.disabled = true;
+        addBtn.textContent = '❌ No disponible';
+        addBtn.style.background = '#999';
+        addBtn.style.cursor = 'not-allowed';
+      }
+      
+      modal.style.display = 'flex';
+    }
+    
+    function closeProductDetail() {
+      document.getElementById('productDetailModal').style.display = 'none';
+    }
+
+    function updateCartBadge() {
+      if (window.cart) {
+        const count = window.cart.getItemCount();
+        const badge = document.getElementById('cartBadge');
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'flex' : 'none';
+      }
+    }
+
+    function openCart() {
+      const modal = document.getElementById('cartModal');
+      const modalContent = document.getElementById('cartModalContent');
+      const body = document.getElementById('cartModalBody');
+
+      modal.classList.add('show');
+      modalContent.classList.add('show');
+
+      if (window.cart && window.cart.items.length > 0) {
+        body.innerHTML = `
+          <div class="cart-actions">
+            <button class="btn btn-outline-danger btn-sm" onclick="clearCart()">
+              🗑️ Vaciar carrito
+            </button>
+          </div>
+          <div class="cart-items">
+            ${window.cart.items.map(item => `
+              <div class="list-item">
+                <div class="list-item-image">${item.image || '🥪'}</div>
+                <div class="list-item-content">
+                  <div class="list-item-name">${item.name}</div>
+                  <div class="list-item-price">$${item.price.toLocaleString('es-CL')}</div>
+                </div>
+                <div class="quantity-selector">
+                  <button onclick="decrementQty('${item.id}')">−</button>
+                  <input type="number" value="${item.quantity}" min="0" onchange="changeQty('${item.id}', this.value)">
+                  <button onclick="incrementQty('${item.id}')">+</button>
+                </div>
+                <button class="btn btn-outline-danger btn-sm remove-item-btn" onclick="removeItem('${item.id}')" title="Eliminar producto">
+                  🗑️
+                </button>
+              </div>
+            `).join('')}
+          </div>
+          <div class="price-summary">
+            <div class="price-row">
+              <span>Subtotal:</span>
+              <span>$${window.cart.getTotal().toLocaleString('es-CL')}</span>
+            </div>
+            <div class="price-row">
+              <span>Envío:</span>
+              <span>$2.990</span>
+            </div>
+            <div class="price-row total">
+              <span>Total:</span>
+              <span>$${(window.cart.getTotal() + 2990).toLocaleString('es-CL')}</span>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary btn-lg btn-block" onclick="goToCheckout()">
+              Ir a Pagar
+            </button>
+          </div>
+        `;
+      } else {
+        body.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🛒</div>
+            <h3 class="empty-state-title">Carrito vacío</h3>
+            <p class="empty-state-message">Agrega productos para comenzar tu pedido</p>
+            <button class="btn btn-primary" onclick="closeCart()">
+              Seguir comprando
+            </button>
+          </div>
+        `;
+      }
+
+      modal.classList.add('show');
+    }
+
+    function closeCart() {
+      const modal = document.getElementById('cartModal');
+      const modalContent = document.getElementById('cartModalContent');
+
+      // Add closing animation (keep show class during animation)
+      modalContent.classList.add('closing');
+
+      // Wait for animation to complete, then hide
+      setTimeout(() => {
+        modal.classList.remove('show');
+        modalContent.classList.remove('show');
+        modalContent.classList.remove('closing');
+      }, 300); // Match the animation duration
+    }
+
+    function incrementQty(productId) {
+      if (window.cart) {
+        const item = window.cart.items.find(i => String(i.id) === String(productId));
+        if (item) {
+          window.cart.updateQuantity(productId, item.quantity + 1);
+          updateCartBadge();
+          openCart();
+        }
+      }
+    }
+
+    function decrementQty(productId) {
+      if (window.cart) {
+        const item = window.cart.items.find(i => String(i.id) === String(productId));
+        if (item && item.quantity > 1) {
+          window.cart.updateQuantity(productId, item.quantity - 1);
+          updateCartBadge();
+          openCart();
+        } else if (item && item.quantity === 1) {
+          // If quantity is 1 and user clicks minus, remove the item
+          removeItem(productId);
+        }
+      }
+    }
+
+    function changeQty(productId, newQuantity) {
+      const qty = parseInt(newQuantity);
+      if (window.cart) {
+        if (qty <= 0) {
+          removeItem(productId);
+        } else {
+          window.cart.updateQuantity(productId, qty);
+          updateCartBadge();
+          openCart();
+        }
+      }
+    }
+
+    function removeItem(productId) {
+      if (window.cart && confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
+        window.cart.removeItem(productId);
+        updateCartBadge();
+        openCart();
+      }
+    }
+
+    function clearCart() {
+      if (window.cart && confirm('¿Estás seguro de que quieres vaciar todo el carrito?')) {
+        window.cart.clearCart();
+        updateCartBadge();
+        openCart();
+      }
+    }
+
+    function goToCheckout() {
+      closeCart();
+      window.location.href = 'B11_Checkout.html';
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', function() {
+      init();
+    });
+  </script>
+
+  <!-- Scripts externos al final -->
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/animations.js"></script>
+</body>
+</html>

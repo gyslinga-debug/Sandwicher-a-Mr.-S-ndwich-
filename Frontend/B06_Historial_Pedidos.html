@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A66B3A">
+  <title>Historial de Pedidos | Mr. Sandwich</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header-content">
+      <div class="brand">
+        <a href="index.html" class="brand-icon" style="text-decoration: none; color: inherit;">
+          <img src="assets/images/logo.png" alt="Mr. Sandwich Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </a>
+        <div class="brand-text">
+          <h1>Mr. Sandwich</h1>
+          <p>Historial de Pedidos</p>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button class="icon-button" onclick="window.history.back()">←</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Page Header -->
+    <section style="margin: var(--spacing-xl) 0; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg); color: var(--brand-brown);">📋</div>
+      <h1 style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark);">Mis Pedidos</h1>
+      <p style="font-size: 1rem; margin-bottom: var(--spacing-xl); color: rgba(43,43,43,0.7);">
+        Historial completo de tus órdenes
+      </p>
+    </section>
+
+    <!-- Loading State -->
+    <div id="loadingState" style="text-align: center; padding: var(--spacing-2xl); display: none;">
+      <div style="font-size: 2rem; margin-bottom: var(--spacing-lg);">⏳</div>
+      <p style="color: rgba(43,43,43,0.7);">Cargando pedidos...</p>
+    </div>
+
+    <!-- Orders List -->
+    <section id="ordersSection" style="max-width: 800px; margin: 0 auto var(--spacing-2xl) auto; display: none;">
+      <div id="ordersList"></div>
+    </section>
+
+    <!-- Empty State -->
+    <section id="emptyState" style="text-align: center; padding: var(--spacing-2xl); background: white; border-radius: var(--border-radius); box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1); max-width: 600px; margin: 0 auto; display: none;">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg); opacity: 0.5;">📭</div>
+      <h3 style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark);">No tienes pedidos</h3>
+      <p style="color: rgba(43,43,43,0.7); margin-bottom: var(--spacing-xl);">
+        Tus pedidos aparecerán aquí una vez que realices tu primera compra
+      </p>
+      <a href="B07_Catalogo.html" style="background: var(--brand-brown); color: white; padding: var(--spacing-md) var(--spacing-xl); border-radius: var(--border-radius); text-decoration: none; font-weight: 600; display: inline-block; box-shadow: 0 4px 12px rgba(166, 107, 58, 0.3);">
+        Ver Catálogo
+      </a>
+    </section>
+
+    <!-- Not Logged In State -->
+    <section id="notLoggedIn" style="text-align: center; padding: var(--spacing-2xl); display: none;">
+      <div style="font-size: 3rem; margin-bottom: var(--spacing-lg);">🔒</div>
+      <h2 style="margin-bottom: var(--spacing-md); color: var(--brand-brown-dark);">Acceso requerido</h2>
+      <p style="margin-bottom: var(--spacing-xl); color: rgba(43,43,43,0.7);">
+        Debes iniciar sesión para ver tus pedidos
+      </p>
+      <a href="B01_Inicio_Sesion.html" style="background: var(--brand-brown); color: white; padding: var(--spacing-md) var(--spacing-xl); border-radius: var(--border-radius); text-decoration: none; font-weight: 600; display: inline-block; box-shadow: 0 4px 12px rgba(166, 107, 58, 0.3);">
+        Iniciar sesión
+      </a>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="index.html">
+      <span class="icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="B07_Catalogo.html">
+      <span class="icon">🥘</span>
+      <span>Catálogo</span>
+    </a>
+    <a href="B10_Carrito_de_Compras.html">
+      <span class="icon">🛒</span>
+      <span>Carrito</span>
+    </a>
+    <a href="B04_Perfil_Usuario.html" class="active">
+      <span class="icon">👤</span>
+      <span>Perfil</span>
+    </a>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let userOrders = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadOrders();
+    });
+
+    async function loadOrders() {
+      const loadingState = document.getElementById('loadingState');
+      const ordersSection = document.getElementById('ordersSection');
+      const emptyState = document.getElementById('emptyState');
+      const notLoggedIn = document.getElementById('notLoggedIn');
+
+      loadingState.style.display = 'block';
+      ordersSection.style.display = 'none';
+      emptyState.style.display = 'none';
+      notLoggedIn.style.display = 'none';
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        loadingState.style.display = 'none';
+        notLoggedIn.style.display = 'block';
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:5000/api/orders/my', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al cargar pedidos');
+        }
+
+        const data = await response.json();
+        // La API devuelve directamente el array de órdenes
+        userOrders = Array.isArray(data) ? data : (data.orders || []);
+        
+        console.log('Pedidos cargados:', userOrders);
+        
+        loadingState.style.display = 'none';
+        
+        if (userOrders.length === 0) {
+          emptyState.style.display = 'block';
+        } else {
+          ordersSection.style.display = 'block';
+          displayOrders();
+        }
+      } catch (error) {
+        console.error('Error loading orders:', error);
+        loadingState.style.display = 'none';
+        emptyState.style.display = 'block';
+      }
+    }
+
+    function displayOrders() {
+      const ordersList = document.getElementById('ordersList');
+      
+      ordersList.innerHTML = userOrders.map(order => {
+        const date = new Date(order.createdAt).toLocaleDateString('es-CL', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        const statusColors = {
+          pending: '#ff9800',
+          confirmed: '#2196f3',
+          preparing: '#9c27b0',
+          ready: '#4caf50',
+          delivered: '#00bcd4',
+          cancelled: '#f44336'
+        };
+
+        const statusLabels = {
+          pending: 'Pendiente',
+          confirmed: 'Confirmado',
+          preparing: 'Preparando',
+          ready: 'Listo',
+          delivered: 'Entregado',
+          cancelled: 'Cancelado'
+        };
+
+        const statusColor = statusColors[order.status] || '#999';
+        const statusLabel = statusLabels[order.status] || order.status;
+        
+        // Check if order can be cancelled
+        const cancellable = ['pending', 'confirmed', 'preparing'].includes(order.status);
+
+        return `
+          <div style="background: white; border-radius: var(--border-radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); box-shadow: 0 4px 20px rgba(166, 107, 58, 0.1); border: 2px solid rgba(166, 107, 58, 0.1);">
+            <!-- Order Header -->
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--spacing-md); padding-bottom: var(--spacing-md); border-bottom: 1px solid #e1e5e9;">
+              <div>
+                <div style="font-weight: 700; color: var(--brand-brown-dark); margin-bottom: 4px; font-size: 1.1rem;">
+                  Pedido #${order._id.slice(-6).toUpperCase()}
+                </div>
+                <div style="color: rgba(43,43,43,0.7); font-size: 0.9rem;">${date}</div>
+              </div>
+              <div style="background: ${statusColor}; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+                ${statusLabel}
+              </div>
+            </div>
+
+            <!-- Order Items -->
+            <div style="margin-bottom: var(--spacing-md);">
+              ${order.items.map(item => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-sm) 0;">
+                  <div>
+                    <span style="font-weight: 600; color: var(--brand-brown-dark);">${item.product?.name || 'Producto'}</span>
+                    <span style="color: rgba(43,43,43,0.6); font-size: 0.9rem;"> × ${item.quantity}</span>
+                  </div>
+                  <div style="font-weight: 600; color: var(--brand-brown);">
+                    $${(item.price * item.quantity).toLocaleString('es-CL')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Order Footer -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: var(--spacing-md); border-top: 2px solid var(--brand-beige);">
+              <div style="font-weight: 700; color: var(--brand-brown-dark); font-size: 1.1rem;">Total</div>
+              <div style="font-weight: 800; color: var(--brand-brown); font-size: 1.3rem;">
+                $${(order.total || order.totalAmount || 0).toLocaleString('es-CL')}
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: grid; grid-template-columns: ${cancellable ? '1fr 1fr 1fr' : '1fr 1fr'}; gap: var(--spacing-sm); margin-top: var(--spacing-md);">
+              <button onclick="viewOrderDetails('${order._id}')" style="background: var(--brand-beige); color: var(--brand-brown-dark); border: 2px solid var(--brand-brown); padding: var(--spacing-sm); border-radius: var(--border-radius); font-size: 0.95rem; font-weight: 600; cursor: pointer;">
+                Ver detalles
+              </button>
+              <button onclick="viewReceipt('${order._id}')" style="background: var(--brand-brown); color: white; border: 2px solid var(--brand-brown); padding: var(--spacing-sm); border-radius: var(--border-radius); font-size: 0.95rem; font-weight: 600; cursor: pointer;">
+                Ver boleta
+              </button>
+              ${cancellable ? `
+                <button onclick="cancelOrder('${order._id}')" style="background: #f44336; color: white; border: 2px solid #c62828; padding: var(--spacing-sm); border-radius: var(--border-radius); font-size: 0.95rem; font-weight: 600; cursor: pointer;">
+                  Anular
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function viewOrderDetails(orderId) {
+      console.log('Ver detalles del pedido:', orderId);
+      window.location.href = `B20_Estado_Entrega.html?orderId=${orderId}`;
+    }
+
+    function viewReceipt(orderId) {
+      console.log('Ver boleta del pedido:', orderId);
+      window.location.href = `B14_Boleta_Digital.html?orderId=${orderId}`;
+    }
+
+    function cancelOrder(orderId) {
+      console.log('Anular pedido:', orderId);
+      window.location.href = `B15_Anulacion_Compra.html?orderId=${orderId}`;
+    }
+  </script>
+</body>
+</html>
